@@ -1,10 +1,11 @@
 import socket
 import os
 
-def start_client(host='127.0.0.1', port=65432):
+def start_client(host, port):
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((host, port))
     print(f"Подключено к серверу {host}:{port}")
+
 
     while True:
       command = s.recv(1024).decode()
@@ -23,5 +24,6 @@ def start_client(host='127.0.0.1', port=65432):
       # Отправка результата обратно на сервер
       s.sendall(output.encode())
 
+
 if __name__ == "__main__":
-  start_client()
+  start_client("127.0.0.1", 65432)
