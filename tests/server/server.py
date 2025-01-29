@@ -18,4 +18,5 @@ def start_server(host='127.0.0.1', port=65432):
                 print(f"Ответ клиента: {response}")
 
 if __name__ == "__main__":
-    start_server()
+    q = input("Укажите в формате айпи:порт сервера (по умолчанию 127.0.0.1:65432)")
+    start_server(q.split(":")[0], int(q.split(":")[1]))
