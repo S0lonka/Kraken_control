@@ -26,11 +26,11 @@ class MainWindow(QMainWindow):
     self.main_layout.addLayout(self.top_buttons_layout)
 
     # Создаем кнопки
-    self.button1 = QPushButton("Терминал")
-    self.button2 = QPushButton("Видео")
-    self.button3 = QPushButton("Текст")
-    self.button4 = QPushButton("Информация")
-    self.button5 = QPushButton("База данных")
+    self.button1 = QPushButton("Terminal")
+    self.button2 = QPushButton("Video")
+    self.button3 = QPushButton("Key Logger")
+    self.button4 = QPushButton("Info")
+    self.button5 = QPushButton("Data Base")
 
     # Добавляем кнопки на верхнюю панель
     self.top_buttons_layout.addWidget(self.button1)
