@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
     self.button3 = QPushButton("Текст")
     self.button4 = QPushButton("Информация")
     self.button5 = QPushButton("База данных")
- 
+
     # Добавляем кнопки на верхнюю панель
     self.top_buttons_layout.addWidget(self.button1)
     self.top_buttons_layout.addWidget(self.button2)
@@ -68,20 +68,13 @@ class MainWindow(QMainWindow):
     """
     self.cursor.execute("""
       CREATE TABLE IF NOT EXISTS test_table (
-        id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        value TEXT
+        ip TEXT,
+        port TEXT
       )
     """)
     self.db_connection.commit()
-
-    # Вставляем тестовые данные, если таблица пуста
-    self.cursor.execute("SELECT COUNT(*) FROM test_table")
-    if self.cursor.fetchone()[0] == 0:
-      self.cursor.executemany("""
-        INSERT INTO test_table (name, value) VALUES (?, ?)
-      """, [("Name 1", "Value 1"), ("Name 2", "Value 2"), ("Name 3", "Value 3")])
-      self.db_connection.commit()
 
   def clear_content(self):
     """
@@ -163,6 +156,11 @@ class MainWindow(QMainWindow):
     """
     self.clear_content()
 
+    # Создаем строку ввода для добавления данных
+    self.db_input = QLineEdit()
+    self.db_input.setPlaceholderText('Введите данные в формате: name="Maks" ip="245.35.0.8" port="44267"')
+    self.db_input.returnPressed.connect(self.add_to_database)
+
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
     self.scroll_area.setWidgetResizable(True)
@@ -170,22 +168,57 @@ class MainWindow(QMainWindow):
     self.table_widget = QTableWidget()
     self.scroll_area.setWidget(self.table_widget)
 
+    # Добавляем строку ввода и таблицу в layout
+    self.content_layout.addWidget(self.db_input)
+    self.content_layout.addWidget(self.scroll_area)
+
+    # Обновляем таблицу данными из базы данных
+    self.update_table()
+
+  def update_table(self):
+    """
+    Обновляет таблицу данными из базы данных.
+    """
     # Получаем данные из базы данных
     self.cursor.execute("SELECT * FROM test_table")
     data = self.cursor.fetchall()
 
     # Устанавливаем количество строк и столбцов в таблице
     self.table_widget.setRowCount(len(data))
-    self.table_widget.setColumnCount(3)
-    self.table_widget.setHorizontalHeaderLabels(["ID", "Name", "Value"])
+    self.table_widget.setColumnCount(4)
+    self.table_widget.setHorizontalHeaderLabels(["ID", "Name", "IP", "Port"])
 
     # Заполняем таблицу данными
     for row_index, row_data in enumerate(data):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
 
-    # Добавляем прокручиваемую область в layout
-    self.content_layout.addWidget(self.scroll_area)
+  def add_to_database(self):
+    """
+    Добавляет данные в базу данных на основе введенной строки.
+    """
+    input_text = self.db_input.text()
+    self.db_input.clear()
+
+    # Разбираем введенные данные
+    data = {}
+    for part in input_text.split():
+      if "=" in part:
+        key, value = part.split("=")
+        key = key.strip()
+        value = value.strip('"')
+        data[key] = value
+
+    # Вставляем данные в базу данных
+    if data:
+      self.cursor.execute("""
+        INSERT INTO test_table (name, ip, port)
+        VALUES (:name, :ip, :port)
+      """, data)
+      self.db_connection.commit()
+
+      # Обновляем таблицу
+      self.update_table()
 
   def closeEvent(self, event):
     """
