@@ -3,4 +3,4 @@
 # git rm --cached <file> 
 
 # Игнорировать все файлы в папке фото для README
-imgReadme/*
+img/imgReadme/*
