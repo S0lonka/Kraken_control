@@ -10,8 +10,9 @@ class MainWindow(QMainWindow):
     super().__init__()
 
     # Настройка основного окна
-    self.setWindowTitle("PyQt5 Multi-Interface App")
-    self.setGeometry(100, 100, 800, 600)
+    self.setWindowTitle("System control")
+    # x, y, width, height
+    self.setGeometry(200, 100, 1200, 700)
 
     # Создаем контейнер для кнопок и основного окна
     self.main_widget = QWidget()
@@ -56,11 +57,13 @@ class MainWindow(QMainWindow):
     self.show_terminal()
 
     # Подключение к базе данных SQLite
-    self.db_connection = sqlite3.connect("example.db")  # Укажите путь к вашей базе данных
+    self.db_connection = sqlite3.connect("sqlite.db")  # Укажите путь к вашей базе данных
     self.cursor = self.db_connection.cursor()
 
     # Создаем тестовую таблицу, если её нет
     self.create_test_table()
+
+
 
   def create_test_table(self):
     """
@@ -138,7 +141,7 @@ class MainWindow(QMainWindow):
     self.info_label = QLabel()
     self.info_label.setAlignment(Qt.AlignLeft)
 
-    info_text = """
+    info_text = f"""
     Вывод1 - [Переменная1]
     Вывод2 - [Переменная2]
     Вывод3 - [Переменная3]
@@ -148,6 +151,8 @@ class MainWindow(QMainWindow):
     self.info_label.setText(info_text)
 
     self.content_layout.addWidget(self.info_label)
+
+
 
   def show_database(self):
     """
