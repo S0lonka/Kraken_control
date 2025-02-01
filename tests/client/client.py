@@ -1,6 +1,6 @@
 import socket
 import os
-
+import subprocess
 def start_client(host, port):
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((host, port))
@@ -13,16 +13,20 @@ def start_client(host, port):
         print("Выход из клиента.")
         break
       print(f"Получена команда: {command}")
-      
+      # ! КАКАЯ ЖЕ ЭТА ЕБАННАЯ ССАНИНА Я ЕГО МАТЬ ЕБАЛ
       try:
         # Выполнение команды и получение результата
-        output = os.popen(command).read()
-
+        output = subprocess.run(command, capture_output=True, text=True, shell=True)
+        response = output.stdout + output.stderr
+        print(output.stdout)
+        if response == "" or response == None:
+          s.sendall("Команда выполнилась без вывода".encode())
+      # ! РОССУМ КОНЧЕННЫЙ ХУЕСОС С ЕГО ЕБАНЫМ ЯЗЫКОМ Я НЕНАВИЖУ СВОЮ РАБОТУ
       except Exception as e:
-        output = str(e)
+        response = str(e)
 
       # Отправка результата обратно на сервер
-      s.sendall(output.encode())
+      s.sendall(response.encode())
 
 
 if __name__ == "__main__":
