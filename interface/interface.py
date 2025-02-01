@@ -63,8 +63,6 @@ class MainWindow(QMainWindow):
     # Создаем тестовую таблицу, если её нет
     self.create_test_table()
 
-
-
   #! Терминал
   def show_terminal(self):
     """
@@ -91,8 +89,6 @@ class MainWindow(QMainWindow):
     self.terminal_output.append(result)
     self.terminal_input.clear()
 
-
-
   #! Видео
   def show_video(self):
     """
@@ -105,8 +101,6 @@ class MainWindow(QMainWindow):
 
     self.content_layout.addWidget(self.video_label)
 
-
-
   #! Key Logger
   def show_keylogger(self):
     """
@@ -118,8 +112,6 @@ class MainWindow(QMainWindow):
     self.text_display.setReadOnly(True)
 
     self.content_layout.addWidget(self.text_display)
-
-
 
   #! Информация
   def show_info(self):
@@ -142,9 +134,6 @@ class MainWindow(QMainWindow):
 
     self.content_layout.addWidget(self.info_label)
 
-
-
-
   #! База данных
   def create_test_table(self):
     """
@@ -160,7 +149,6 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
-
   #* Отображение
   def show_database(self):
     """
@@ -171,8 +159,8 @@ class MainWindow(QMainWindow):
 
     # Создаем строку ввода для добавления данных
     self.db_input = QLineEdit()
-    self.db_input.setPlaceholderText('Введите данные в формате: name="John" ip="245.35.0.8" port="44267"')
-    self.db_input.returnPressed.connect(self.add_to_database)
+    self.db_input.setPlaceholderText('Введите данные в формате: name="John" ip="245.35.0.8" port="44267" или delete="1"')
+    self.db_input.returnPressed.connect(self.process_db_input)
 
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
@@ -187,7 +175,6 @@ class MainWindow(QMainWindow):
 
     # Обновляем таблицу данными из базы данных
     self.update_table()
-
 
   #* Обновление таблицы
   def update_table(self):
@@ -208,11 +195,10 @@ class MainWindow(QMainWindow):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
 
-
-  #* Добавление в таблицу
-  def add_to_database(self):
+  #* Обработка ввода
+  def process_db_input(self):
     """
-    Добавляет данные в базу данных на основе введенной строки.
+    Обрабатывает ввод в строке базы данных.
     """
     input_text = self.db_input.text()
     self.db_input.clear()
@@ -226,17 +212,23 @@ class MainWindow(QMainWindow):
         value = value.strip('"')
         data[key] = value
 
-    # Вставляем данные в базу данных
-    if data:
+    # Если введена команда на удаление
+    if "delete" in data:
+      try:
+        user_id = int(data["delete"])
+        self.cursor.execute("DELETE FROM test_table WHERE id = ?", (user_id,))
+        self.db_connection.commit()
+        self.update_table()
+      except ValueError:
+        pass  # Игнорируем некорректный ввод
+    # Если введены данные для добавления
+    elif all(key in data for key in ["name", "ip", "port"]):
       self.cursor.execute("""
         INSERT INTO test_table (name, ip, port)
         VALUES (:name, :ip, :port)
       """, data)
       self.db_connection.commit()
-
-      # Обновляем таблицу
       self.update_table()
-
 
   #* Закрытие базы данных
   def closeEvent(self, event):
@@ -246,8 +238,6 @@ class MainWindow(QMainWindow):
     self.db_connection.close()
     event.accept()
 
-
-
   #! Очистка интерфейса
   def clear_content(self):
     """
@@ -255,8 +245,6 @@ class MainWindow(QMainWindow):
     """
     for i in reversed(range(self.content_layout.count())):
       self.content_layout.itemAt(i).widget().setParent(None)
-
-
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
