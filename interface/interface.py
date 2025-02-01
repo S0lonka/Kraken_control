@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
     super().__init__()
     #! Основные настройки
     # Настройка основного окна
-    self.setWindowTitle("System control")
+    self.setWindowTitle("KRAKEN - System control")
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
 
@@ -115,6 +115,7 @@ class MainWindow(QMainWindow):
     self.clear_content()
 
     self.terminal_input = QLineEdit()
+    self.terminal_input.setPlaceholderText('Введите команду для терминала')
     self.terminal_output = QTextEdit()
     self.terminal_output.setReadOnly(True)
 
