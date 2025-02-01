@@ -1,6 +1,6 @@
 import socket
 
-def start_server(host='127.0.0.1', port=65432):
+def start_server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, port))
         s.listen()
@@ -16,7 +16,9 @@ def start_server(host='127.0.0.1', port=65432):
                 conn.sendall(command.encode())
                 response = conn.recv(1024).decode()
                 print(f"Ответ клиента: {response}")
-
+# ! КАКАЯ ЖЕ ЭТА ЕБАННАЯ ССАНИНА Я ЕГО МАТЬ ЕБАЛ
 if __name__ == "__main__":
-    q = input("Укажите в формате айпи:порт сервера (по умолчанию 127.0.0.1:65432)")
+    q = input("Укажите в формате айпи:порт сервера (по умолчанию 127.0.0.1:65432)\n> ")
+    if q == "":
+        start_server("localhost", 65432)
     start_server(q.split(":")[0], int(q.split(":")[1]))
