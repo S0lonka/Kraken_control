@@ -14,6 +14,50 @@ class MainWindow(QMainWindow):
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
 
+    # Применяем стили
+    self.setStyleSheet("""
+      QWidget {
+        background-color: #2E3440;  /* Темно-серый фон */
+        color: #ECEFF4;  /* Белый текст */
+      }
+      QPushButton {
+        background-color: #4C566A;  /* Серый фон кнопок */
+        color: #ECEFF4;  /* Белый текст */
+        border: 1px solid #81A1C1;  /* Голубая рамка */
+        padding: 5px;
+        border-radius: 3px;
+      }
+      QPushButton:hover {
+        background-color: #81A1C1;  /* Голубой фон при наведении */
+        color: #2E3440;  /* Темный текст */
+      }
+      QLineEdit, QTextEdit {
+        background-color: #3B4252;  /* Темно-серый фон полей ввода */
+        color: #ECEFF4;  /* Белый текст */
+        border: 1px solid #81A1C1;  /* Голубая рамка */
+        padding: 5px;
+        border-radius: 3px;
+      }
+      QTableWidget {
+        background-color: #3B4252;  /* Темно-серый фон таблицы */
+        color: #ECEFF4;  /* Белый текст */
+        gridline-color: #81A1C1;  /* Голубые линии сетки */
+      }
+      QHeaderView::section {
+        background-color: #4C566A;  /* Серый фон заголовков таблицы */
+        color: #ECEFF4;  /* Белый текст */
+        padding: 5px;
+        border: 1px solid #81A1C1;  /* Голубая рамка */
+      }
+      QScrollArea {
+        background-color: #2E3440;  /* Темно-серый фон */
+        border: none;
+      }
+      QLabel {
+        color: #ECEFF4;  /* Белый текст */
+      }
+    """)
+
     # Создаем контейнер для кнопок и основного окна
     self.main_widget = QWidget()
     self.setCentralWidget(self.main_widget)
