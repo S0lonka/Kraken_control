@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
-
+    #! Основные настройки
     # Настройка основного окна
     self.setWindowTitle("System control")
     # x, y, width, height
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
     # Подключаем кнопки к соответствующим функциям
     self.button1.clicked.connect(self.show_terminal)
     self.button2.clicked.connect(self.show_video)
-    self.button3.clicked.connect(self.show_text)
+    self.button3.clicked.connect(self.show_keylogger)
     self.button4.clicked.connect(self.show_info)
     self.button5.clicked.connect(self.show_database)
 
@@ -65,27 +65,7 @@ class MainWindow(QMainWindow):
 
 
 
-  def create_test_table(self):
-    """
-    Создает тестовую таблицу в базе данных, если она не существует.
-    """
-    self.cursor.execute("""
-      CREATE TABLE IF NOT EXISTS test_table (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        ip TEXT,
-        port TEXT
-      )
-    """)
-    self.db_connection.commit()
-
-  def clear_content(self):
-    """
-    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
-    """
-    for i in reversed(range(self.content_layout.count())):
-      self.content_layout.itemAt(i).widget().setParent(None)
-
+  #! Терминал
   def show_terminal(self):
     """
     Отображает интерфейс терминала.
@@ -101,6 +81,7 @@ class MainWindow(QMainWindow):
 
     self.terminal_input.returnPressed.connect(self.execute_command)
 
+  #* Обработка комманд
   def execute_command(self):
     """
     Обрабатывает ввод команды в терминале.
@@ -110,6 +91,9 @@ class MainWindow(QMainWindow):
     self.terminal_output.append(result)
     self.terminal_input.clear()
 
+
+
+  #! Видео
   def show_video(self):
     """
     Отображает интерфейс для видео.
@@ -121,9 +105,12 @@ class MainWindow(QMainWindow):
 
     self.content_layout.addWidget(self.video_label)
 
-  def show_text(self):
+
+
+  #! Key Logger
+  def show_keylogger(self):
     """
-    Отображает интерфейс для текста.
+    Отображает интерфейс для key logger-а.
     """
     self.clear_content()
 
@@ -132,6 +119,9 @@ class MainWindow(QMainWindow):
 
     self.content_layout.addWidget(self.text_display)
 
+
+
+  #! Информация
   def show_info(self):
     """
     Отображает интерфейс для информации.
@@ -154,6 +144,24 @@ class MainWindow(QMainWindow):
 
 
 
+
+  #! База данных
+  def create_test_table(self):
+    """
+    Создает тестовую таблицу в базе данных, если она не существует.
+    """
+    self.cursor.execute("""
+      CREATE TABLE IF NOT EXISTS test_table (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        ip TEXT,
+        port TEXT
+      )
+    """)
+    self.db_connection.commit()
+
+
+  #* Отображение
   def show_database(self):
     """
     Отображает интерфейс для базы данных.
@@ -180,6 +188,8 @@ class MainWindow(QMainWindow):
     # Обновляем таблицу данными из базы данных
     self.update_table()
 
+
+  #* Обновление таблицы
   def update_table(self):
     """
     Обновляет таблицу данными из базы данных.
@@ -198,6 +208,8 @@ class MainWindow(QMainWindow):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
 
+
+  #* Добаление в таблицу
   def add_to_database(self):
     """
     Добавляет данные в базу данных на основе введенной строки.
@@ -225,12 +237,26 @@ class MainWindow(QMainWindow):
       # Обновляем таблицу
       self.update_table()
 
+
+  #* Закрытие базы данных
   def closeEvent(self, event):
     """
     Закрывает соединение с базой данных при закрытии приложения.
     """
     self.db_connection.close()
     event.accept()
+
+
+
+  #! Очистка интерфейса
+  def clear_content(self):
+    """
+    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
+    """
+    for i in reversed(range(self.content_layout.count())):
+      self.content_layout.itemAt(i).widget().setParent(None)
+
+
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
