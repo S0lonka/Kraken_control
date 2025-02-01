@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
     self.cursor = self.db_connection.cursor()
 
     # Создаем тестовую таблицу, если её нет
-    self.create_test_table()
+    self.create_connection_table()
 
   #! Терминал
   def show_terminal(self):
@@ -135,12 +135,12 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.info_label)
 
   #! База данных
-  def create_test_table(self):
+  def create_connection_table(self):
     """
     Создает тестовую таблицу в базе данных, если она не существует.
     """
     self.cursor.execute("""
-      CREATE TABLE IF NOT EXISTS test_table (
+      CREATE TABLE IF NOT EXISTS connection_table (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         ip TEXT,
@@ -182,13 +182,13 @@ class MainWindow(QMainWindow):
     Обновляет таблицу данными из базы данных.
     """
     # Получаем данные из базы данных
-    self.cursor.execute("SELECT * FROM test_table")
+    self.cursor.execute("SELECT name, ip, port FROM connection_table")
     data = self.cursor.fetchall()
 
     # Устанавливаем количество строк и столбцов в таблице
     self.table_widget.setRowCount(len(data))
-    self.table_widget.setColumnCount(4)
-    self.table_widget.setHorizontalHeaderLabels(["ID", "Name", "IP", "Port"])
+    self.table_widget.setColumnCount(3)
+    self.table_widget.setHorizontalHeaderLabels(["Name", "IP", "Port"])
 
     # Заполняем таблицу данными
     for row_index, row_data in enumerate(data):
@@ -215,16 +215,30 @@ class MainWindow(QMainWindow):
     # Если введена команда на удаление
     if "delete" in data:
       try:
-        user_id = int(data["delete"])
-        self.cursor.execute("DELETE FROM test_table WHERE id = ?", (user_id,))
-        self.db_connection.commit()
-        self.update_table()
+        row_number = int(data["delete"])  # Номер строки, введенный пользователем
+        if row_number < 1:
+          print("Номер строки должен быть больше 0")
+          return
+
+        # Получаем данные из таблицы
+        self.cursor.execute("SELECT id FROM connection_table")
+        ids = [row[0] for row in self.cursor.fetchall()]
+
+        # Проверяем, что номер строки корректен
+        if 1 <= row_number <= len(ids):
+          # Удаляем строку из базы данных
+          self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
+          self.db_connection.commit()
+          self.update_table()
+        else:
+          print("Номер строки вне диапазона")
       except ValueError:
-        pass  # Игнорируем некорректный ввод
+        print("Ошибка в удалении: некорректный ввод")
+
     # Если введены данные для добавления
     elif all(key in data for key in ["name", "ip", "port"]):
       self.cursor.execute("""
-        INSERT INTO test_table (name, ip, port)
+        INSERT INTO connection_table (name, ip, port)
         VALUES (:name, :ip, :port)
       """, data)
       self.db_connection.commit()
