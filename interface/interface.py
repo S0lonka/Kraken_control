@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
 
     self.terminal_input.returnPressed.connect(self.execute_command)
 
-  #* Обработка комманд
+  #* Обработка команд
   def execute_command(self):
     """
     Обрабатывает ввод команды в терминале.
@@ -171,7 +171,7 @@ class MainWindow(QMainWindow):
 
     # Создаем строку ввода для добавления данных
     self.db_input = QLineEdit()
-    self.db_input.setPlaceholderText('Введите данные в формате: name="Maks" ip="245.35.0.8" port="44267"')
+    self.db_input.setPlaceholderText('Введите данные в формате: name="John" ip="245.35.0.8" port="44267"')
     self.db_input.returnPressed.connect(self.add_to_database)
 
     # Создаем прокручиваемую область и таблицу
@@ -209,7 +209,7 @@ class MainWindow(QMainWindow):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
 
 
-  #* Добаление в таблицу
+  #* Добавление в таблицу
   def add_to_database(self):
     """
     Добавляет данные в базу данных на основе введенной строки.
