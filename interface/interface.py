@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
 
+# Импортируем серверную часть
+from server import start_server
+
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -107,6 +110,9 @@ class MainWindow(QMainWindow):
     # Создаем тестовую таблицу, если её нет
     self.create_connection_table()
 
+    # Переменная для хранения состояния сервера
+    self.server_running = False
+
   #! Терминал
   def show_terminal(self):
     """
@@ -130,9 +136,41 @@ class MainWindow(QMainWindow):
     Обрабатывает ввод команды в терминале.
     """
     command = self.terminal_input.text()
-    result = f"Выполнена команда: {command}"  # Заглушка для результата
-    self.terminal_output.append(result)
     self.terminal_input.clear()
+
+    if command == "connect":
+      if not self.server_running:
+        self.server_running = True
+        self.terminal_output.append("Сервер запущен на 127.0.0.1:65432\n")
+
+        if self.server_running:
+          # Отправляем команду на сервер и получаем ответ
+          response = start_server("127.0.0.1", 65432)
+        else:
+          self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
+
+        # Запуск сервера в отдельном потоке (или асинхронно)
+        # Здесь можно использовать threading или asyncio для запуска сервера
+        # Например:
+        # threading.Thread(target=start_server, args=("127.0.0.1", 65432)).start()
+      else:
+        self.terminal_output.append("Сервер уже запущен\n")
+
+    elif command == "disconnect":
+      if self.server_running:
+        self.server_running = False
+        self.terminal_output.append("Сервер остановлен\n")
+        # Здесь можно добавить код для остановки сервера
+      else:
+        self.terminal_output.append("Сервер не был запущен\n")
+
+    else:
+      if self.server_running:
+        # Отправляем команду на сервер и получаем ответ
+        response = start_server("127.0.0.1", 65432, command)
+        self.terminal_output.append(f"Команда: {command}\nОтвет: {response}\n")
+      else:
+        self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
 
   #! Видео
   def show_video(self):
