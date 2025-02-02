@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
 
+
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -107,6 +108,9 @@ class MainWindow(QMainWindow):
     # Создаем тестовую таблицу, если её нет
     self.create_connection_table()
 
+    # Переменная для хранения состояния сервера
+    self.server_running = False
+
   #! Терминал
   def show_terminal(self):
     """
@@ -130,9 +134,31 @@ class MainWindow(QMainWindow):
     Обрабатывает ввод команды в терминале.
     """
     command = self.terminal_input.text()
-    result = f"Выполнена команда: {command}"  # Заглушка для результата
-    self.terminal_output.append(result)
     self.terminal_input.clear()
+
+    if command == "connect":
+      if not self.server_running:
+        self.server_running = True
+        self.terminal_output.append("Сервер запущен на 127.0.0.1:65432\n")
+
+    elif command == "disconnect":
+      if self.server_running:
+        self.server_running = False
+        self.terminal_output.append("Сервер остановлен\n")
+        # Здесь можно добавить код для остановки сервера
+      else:
+        self.terminal_output.append("Сервер не был запущен\n")
+
+    else:
+      if self.server_running:
+        # Отправляем команду на сервер и получаем ответ
+        response = start_server("127.0.0.1", 65432, command)
+        self.terminal_output.append(f"Команда: {command}\nОтвет: {response}\n")
+      else:
+        self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
+
+
+
 
   #! Видео
   def show_video(self):
@@ -194,7 +220,6 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
-  #* Отображение
   def show_database(self):
     """
     Отображает интерфейс для базы данных.
@@ -202,10 +227,27 @@ class MainWindow(QMainWindow):
     """
     self.clear_content()
 
-    # Создаем строку ввода для добавления данных
-    self.db_input = QLineEdit()
-    self.db_input.setPlaceholderText('Введите данные в формате: name="John" ip="245.35.0.8" port="44267" или delete="1"')
-    self.db_input.returnPressed.connect(self.process_db_input)
+    # Создаем контейнер для полей ввода и кнопки
+    self.input_container = QWidget()
+    self.input_layout = QHBoxLayout(self.input_container)
+
+    # Создаем поля ввода для name, ip и port
+    self.name_input = QLineEdit()
+    self.name_input.setPlaceholderText("Name")
+    self.ip_input = QLineEdit()
+    self.ip_input.setPlaceholderText("IP")
+    self.port_input = QLineEdit()
+    self.port_input.setPlaceholderText("Port")
+
+    # Создаем кнопку "Добавить"
+    self.add_button = QPushButton("Добавить")
+    self.add_button.clicked.connect(self.add_to_database)
+
+    # Добавляем поля ввода и кнопку в layout
+    self.input_layout.addWidget(self.name_input)
+    self.input_layout.addWidget(self.ip_input)
+    self.input_layout.addWidget(self.port_input)
+    self.input_layout.addWidget(self.add_button)
 
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
@@ -214,11 +256,41 @@ class MainWindow(QMainWindow):
     self.table_widget = QTableWidget()
     self.scroll_area.setWidget(self.table_widget)
 
-    # Добавляем строку ввода и таблицу в layout
-    self.content_layout.addWidget(self.db_input)
+    # Добавляем контейнер с полями ввода и таблицу в layout
+    self.content_layout.addWidget(self.input_container)
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
+    self.update_table()
+
+  #* Добавление данных в базу данных
+  def add_to_database(self):
+    """
+    Добавляет данные из полей ввода в базу данных.
+    """
+    # Получаем данные из полей ввода
+    name = self.name_input.text().strip()
+    ip = self.ip_input.text().strip()
+    port = self.port_input.text().strip()
+
+    # Проверяем, что все поля заполнены
+    if not name or not ip or not port:
+      print("Все поля должны быть заполнены")
+      return
+
+    # Добавляем данные в базу данных
+    self.cursor.execute("""
+      INSERT INTO connection_table (name, ip, port)
+      VALUES (?, ?, ?)
+    """, (name, ip, port))
+    self.db_connection.commit()
+
+    # Очищаем поля ввода
+    self.name_input.clear()
+    self.ip_input.clear()
+    self.port_input.clear()
+
+    # Обновляем таблицу
     self.update_table()
 
   #* Обновление таблицы
@@ -240,54 +312,6 @@ class MainWindow(QMainWindow):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
 
-  #* Обработка ввода
-  def process_db_input(self):
-    """
-    Обрабатывает ввод в строке базы данных.
-    """
-    input_text = self.db_input.text()
-    self.db_input.clear()
-
-    # Разбираем введенные данные
-    data = {}
-    for part in input_text.split():
-      if "=" in part:
-        key, value = part.split("=")
-        key = key.strip()
-        value = value.strip('"')
-        data[key] = value
-
-    # Если введена команда на удаление
-    if "delete" in data:
-      try:
-        row_number = int(data["delete"])  # Номер строки, введенный пользователем
-        if row_number < 1:
-          print("Номер строки должен быть больше 0")
-          return
-
-        # Получаем данные из таблицы
-        self.cursor.execute("SELECT id FROM connection_table")
-        ids = [row[0] for row in self.cursor.fetchall()]
-
-        # Проверяем, что номер строки корректен
-        if 1 <= row_number <= len(ids):
-          # Удаляем строку из базы данных
-          self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
-          self.db_connection.commit()
-          self.update_table()
-        else:
-          print("Номер строки вне диапазона")
-      except ValueError:
-        print("Ошибка в удалении: некорректный ввод")
-
-    # Если введены данные для добавления
-    elif all(key in data for key in ["name", "ip", "port"]):
-      self.cursor.execute("""
-        INSERT INTO connection_table (name, ip, port)
-        VALUES (:name, :ip, :port)
-      """, data)
-      self.db_connection.commit()
-      self.update_table()
 
   #* Закрытие базы данных
   def closeEvent(self, event):
