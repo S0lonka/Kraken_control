@@ -1,5 +1,7 @@
 import sys
 import sqlite3
+import os
+import subprocess
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, 
                              QPushButton, QHBoxLayout, QMessageBox, QLineEdit, QFileDialog)
 from PyQt5.QtGui import QPixmap, QIcon
@@ -88,10 +90,8 @@ class MainWindow(QMainWindow):
     self.connect_button.setFixedSize(150, 50)
     self.connect_button.clicked.connect(self.connect_to_db)
     # Добавляем кнопки в layout
-
     self.main_layout.addWidget(self.create_button)
     self.main_layout.addWidget(self.connect_button)
-
 
   def create_interface(self):
     """
@@ -151,6 +151,50 @@ class MainWindow(QMainWindow):
         return False
     return True
 
+  def generate_script(self, ip, port, output_path):
+    """
+    Генерирует Python-скрипт на основе введённых данных.
+    """
+    script_content = f"""
+import socket
+
+def connect_to_server(ip, port):
+  try:
+    # Создаем сокет
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((ip, int(port)))
+    print(f"Подключено к {{ip}}:{{port}}")
+    client_socket.close()
+  except Exception as e:
+    print(f"Ошибка подключения: {{e}}")
+
+if __name__ == "__main__":
+  # Данные для подключения
+  ip = "{ip}"
+  port = {port}
+
+  # Подключение к серверу
+  connect_to_server(ip, port)
+"""
+    # Сохраняем скрипт в указанный путь
+    script_path = os.path.join(output_path, "generated_script.py")
+    with open(script_path, "w", encoding="utf-8") as f:
+      f.write(script_content)
+    return script_path
+
+  def package_to_exe(self, script_path, output_path):
+    """
+    Упаковывает скрипт в .exe с помощью PyInstaller.
+    """
+    try:
+      # Команда для PyInstaller
+      command = f"pyinstaller --onefile --distpath {output_path} {script_path}"
+      subprocess.call(command, shell=True)
+      return True
+    except Exception as e:
+      print(f"Ошибка при упаковке: {e}")
+      return False
+
   def create_database(self):
     """
     Создает SQLite таблицу, если IP корректен.
@@ -166,25 +210,36 @@ class MainWindow(QMainWindow):
       QMessageBox.warning(self, "Ошибка", "Выберите путь для создания файла")
       return
 
+    # Показываем сообщение о начале загрузки
+    QMessageBox.information(self, "Информация", "Загрузка .exe client началась, не закрывайте окно")
+
     try:
-      conn = sqlite3.connect("sqlite.db")
-      cursor = conn.cursor()
-      # Создаем таблицу connection_table
-      cursor.execute("""
-        CREATE TABLE IF NOT EXISTS connection_table (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT,
-          ip TEXT,
-          port TEXT
-        )
-      """)
-      conn.commit()
-      QMessageBox.information(self, "Успех", "Таблица успешно создана!")
-    except sqlite3.Error as e:
-      QMessageBox.critical(self, "Ошибка", f"Ошибка при создании таблицы: {e}")
-    finally:
-      if conn:
-        conn.close()
+      # Генерация скрипта
+      script_path = self.generate_script(
+        self.ip_input.text().strip(),
+        self.port_input.text().strip(),
+        path
+      )
+      # Упаковка в .exe
+      if self.package_to_exe(script_path, path):
+        QMessageBox.information(self, "Успех", "Скрипт успешно упакован в .exe!")
+        # Закрываем текущее окно
+        self.close()
+        # Запускаем другой скрипт (interface.py)
+        self.run_interface_script()
+      else:
+        QMessageBox.warning(self, "Ошибка", "Ошибка при упаковке скрипта")
+    except Exception as e:
+      QMessageBox.critical(self, "Ошибка", f"Ошибка: {e}")
+
+  def run_interface_script(self):
+    """
+    Запускает другой скрипт (interface.py).
+    """
+    try:
+      subprocess.Popen([sys.executable, "interface.py"])
+    except Exception as e:
+      QMessageBox.critical(self, "Ошибка", f"Не удалось запустить interface.py: {e}")
 
   def connect_to_db(self):
     """
@@ -213,8 +268,6 @@ class MainWindow(QMainWindow):
       if conn:
         conn.close()
 
-
-
   def clear_interface(self):
     """
     Очищает текущий интерфейс, удаляя все виджеты.
@@ -224,14 +277,6 @@ class MainWindow(QMainWindow):
       if widget:
         widget.setParent(None)
 
-  def clear_layout(self):
-    """
-    Очищает текущий layout, удаляя все виджеты.
-    """
-    for i in reversed(range(self.main_layout.count())):
-      widget = self.main_layout.itemAt(i).widget()
-      if widget:
-        widget.setParent(None)
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
