@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
-
+import main.server as server
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
     else:
       if self.server_running:
         # Отправляем команду на сервер и получаем ответ
-        response = start_server("127.0.0.1", 65432, command)
+        response = server.start_server("127.0.0.1", 65432, command)
         self.terminal_output.append(f"Команда: {command}\nОтвет: {response}\n")
       else:
         self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
