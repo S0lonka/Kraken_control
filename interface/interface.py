@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 
 
 class MainWindow(QMainWindow):
@@ -12,6 +13,11 @@ class MainWindow(QMainWindow):
     #! Основные настройки
     # Настройка основного окна
     self.setWindowTitle("KRAKEN - System control")
+
+    # Иконка приложения
+    icon_path = "img/imgReadme/kraken.jpg" 
+    self.setWindowIcon(QIcon(icon_path))
+
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
 
@@ -148,16 +154,6 @@ class MainWindow(QMainWindow):
         # Здесь можно добавить код для остановки сервера
       else:
         self.terminal_output.append("Сервер не был запущен\n")
-
-    else:
-      if self.server_running:
-        # Отправляем команду на сервер и получаем ответ
-        response = start_server("127.0.0.1", 65432, command)
-        self.terminal_output.append(f"Команда: {command}\nОтвет: {response}\n")
-      else:
-        self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
-
-
 
 
   #! Видео
