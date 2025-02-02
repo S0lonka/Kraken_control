@@ -220,6 +220,7 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
+  #* Отображение
   def show_database(self):
     """
     Отображает интерфейс для базы данных.
@@ -227,7 +228,7 @@ class MainWindow(QMainWindow):
     """
     self.clear_content()
 
-    # Создаем контейнер для полей ввода и кнопки
+    # Создаем контейнер для полей ввода и кнопки добавления
     self.input_container = QWidget()
     self.input_layout = QHBoxLayout(self.input_container)
 
@@ -249,6 +250,24 @@ class MainWindow(QMainWindow):
     self.input_layout.addWidget(self.port_input)
     self.input_layout.addWidget(self.add_button)
 
+    # Создаем контейнер для удаления строк
+    self.delete_container = QWidget()
+    self.delete_layout = QHBoxLayout(self.delete_container)
+
+    # Создаем поле ввода для номера строки
+    self.delete_input = QLineEdit()
+    self.delete_input.setPlaceholderText("Номер строки")
+    self.delete_input.setFixedWidth(100)  # Ограничиваем ширину поля ввода
+
+    # Создаем кнопку "Удалить"
+    self.delete_button = QPushButton("Удалить")
+    self.delete_button.clicked.connect(self.delete_from_database)
+
+    # Добавляем поле ввода и кнопку в layout
+    self.delete_layout.addWidget(self.delete_input)
+    self.delete_layout.addWidget(self.delete_button)
+    self.delete_layout.addStretch()  # Добавляем растяжку, чтобы кнопка была слева
+
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
     self.scroll_area.setWidgetResizable(True)
@@ -256,8 +275,9 @@ class MainWindow(QMainWindow):
     self.table_widget = QTableWidget()
     self.scroll_area.setWidget(self.table_widget)
 
-    # Добавляем контейнер с полями ввода и таблицу в layout
+    # Добавляем контейнеры с полями ввода и таблицу в layout
     self.content_layout.addWidget(self.input_container)
+    self.content_layout.addWidget(self.delete_container)
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
@@ -292,6 +312,39 @@ class MainWindow(QMainWindow):
 
     # Обновляем таблицу
     self.update_table()
+
+  #* Удаление строки из базы данных
+  def delete_from_database(self):
+    """
+    Удаляет строку из базы данных по указанному номеру.
+    """
+    # Получаем номер строки из поля ввода
+    row_number_text = self.delete_input.text().strip()
+    if not row_number_text:
+      print("Введите номер строки")
+      return
+
+    try:
+      row_number = int(row_number_text)  # Преобразуем в число
+      if row_number < 1:
+        print("Номер строки должен быть больше 0")
+        return
+
+      # Получаем список ID из базы данных
+      self.cursor.execute("SELECT id FROM connection_table")
+      ids = [row[0] for row in self.cursor.fetchall()]
+
+      # Проверяем, что номер строки корректен
+      if 1 <= row_number <= len(ids):
+        # Удаляем строку из базы данных
+        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
+        self.db_connection.commit()
+        self.update_table()  # Обновляем таблицу
+        self.delete_input.clear()  # Очищаем поле ввода
+      else:
+        print("Номер строки вне диапазона")
+    except ValueError:
+      print("Ошибка: введите корректный номер строки")
 
   #* Обновление таблицы
   def update_table(self):
