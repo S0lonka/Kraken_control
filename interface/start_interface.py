@@ -2,10 +2,12 @@ import sys
 import sqlite3
 import os
 import subprocess
+import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, 
                              QPushButton, QHBoxLayout, QMessageBox, QLineEdit, QFileDialog)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt
+from qasync import asyncSlot, QEventLoop
 
 
 class MainWindow(QMainWindow):
@@ -75,7 +77,8 @@ class MainWindow(QMainWindow):
     self.start_button.clicked.connect(self.change_interface)
     self.main_layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
 
-  def change_interface(self):
+  @asyncSlot()
+  async def change_interface(self):
     """
     Меняет интерфейс после нажатия кнопки START.
     """
@@ -93,7 +96,8 @@ class MainWindow(QMainWindow):
     self.main_layout.addWidget(self.create_button)
     self.main_layout.addWidget(self.connect_button)
 
-  def create_interface(self):
+  @asyncSlot()
+  async def create_interface(self):
     """
     Создает интерфейс для выбора пути и ввода данных.
     """
@@ -127,7 +131,8 @@ class MainWindow(QMainWindow):
     self.create_db_button.clicked.connect(self.create_database)
     self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignCenter)
 
-  def select_path(self):
+  @asyncSlot()
+  async def select_path(self):
     """
     Открывает проводник для выбора пути.
     """
@@ -182,20 +187,27 @@ if __name__ == "__main__":
       f.write(script_content)
     return script_path
 
-  def package_to_exe(self, script_path, output_path):
+  @asyncSlot()
+  async def package_to_exe(self, script_path, output_path):
     """
     Упаковывает скрипт в .exe с помощью PyInstaller.
     """
     try:
       # Команда для PyInstaller
       command = f"pyinstaller --onefile --distpath {output_path} {script_path}"
-      subprocess.call(command, shell=True)
-      return True
+      process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+      stdout, stderr = await process.communicate()
+      if process.returncode == 0:
+        return True
+      else:
+        print(f"Ошибка при упаковке: {stderr.decode()}")
+        return False
     except Exception as e:
       print(f"Ошибка при упаковке: {e}")
       return False
 
-  def create_database(self):
+  @asyncSlot()
+  async def create_database(self):
     """
     Создает SQLite таблицу, если IP корректен.
     """
@@ -221,27 +233,30 @@ if __name__ == "__main__":
         path
       )
       # Упаковка в .exe
-      if self.package_to_exe(script_path, path):
+      if await self.package_to_exe(script_path, path):
         QMessageBox.information(self, "Успех", "Скрипт успешно упакован в .exe!")
         # Закрываем текущее окно
         self.close()
         # Запускаем другой скрипт (interface.py)
-        self.run_interface_script()
+        await self.run_interface_script()
       else:
         QMessageBox.warning(self, "Ошибка", "Ошибка при упаковке скрипта")
     except Exception as e:
       QMessageBox.critical(self, "Ошибка", f"Ошибка: {e}")
 
-  def run_interface_script(self):
+  @asyncSlot()
+  async def run_interface_script(self):
     """
     Запускает другой скрипт (interface.py).
     """
     try:
-      subprocess.Popen([sys.executable, "interface.py"])
+      process = await asyncio.create_subprocess_exec(sys.executable, "interface.py")
+      await process.wait()
     except Exception as e:
       QMessageBox.critical(self, "Ошибка", f"Не удалось запустить interface.py: {e}")
 
-  def connect_to_db(self):
+  @asyncSlot()
+  async def connect_to_db(self):
     """
     Проверяет наличие данных в БД и разрешает подключение, если данные есть.
     """
@@ -280,6 +295,11 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
+  loop = QEventLoop(app)
+  asyncio.set_event_loop(loop)
+
   window = MainWindow()
   window.show()
-  sys.exit(app.exec_())
+
+  with loop:
+    loop.run_forever()
