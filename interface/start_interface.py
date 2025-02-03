@@ -156,55 +156,7 @@ class MainWindow(QMainWindow):
         return False
     return True
 
-  def generate_script(self, ip, port, output_path):
-    """
-    Генерирует Python-скрипт на основе введённых данных.
-    """
-    script_content = f"""
-import socket
 
-def connect_to_server(ip, port):
-  try:
-    # Создаем сокет
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((ip, int(port)))
-    print(f"Подключено к {{ip}}:{{port}}")
-    client_socket.close()
-  except Exception as e:
-    print(f"Ошибка подключения: {{e}}")
-
-if __name__ == "__main__":
-  # Данные для подключения
-  ip = "{ip}"
-  port = {port}
-
-  # Подключение к серверу
-  connect_to_server(ip, port)
-"""
-    # Сохраняем скрипт в указанный путь
-    script_path = os.path.join(output_path, "generated_script.py")
-    with open(script_path, "w", encoding="utf-8") as f:
-      f.write(script_content)
-    return script_path
-
-  @asyncSlot()
-  async def package_to_exe(self, script_path, output_path):
-    """
-    Упаковывает скрипт в .exe с помощью PyInstaller.
-    """
-    try:
-      # Команда для PyInstaller
-      command = f"pyinstaller --onefile --distpath {output_path} {script_path}"
-      process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-      stdout, stderr = await process.communicate()
-      if process.returncode == 0:
-        return True
-      else:
-        print(f"Ошибка при упаковке: {stderr.decode()}")
-        return False
-    except Exception as e:
-      print(f"Ошибка при упаковке: {e}")
-      return False
 
   @asyncSlot()
   async def create_database(self):
@@ -225,24 +177,8 @@ if __name__ == "__main__":
     # Показываем сообщение о начале загрузки
     QMessageBox.information(self, "Информация", "Загрузка .exe client началась, не закрывайте окно")
 
-    try:
-      # Генерация скрипта
-      script_path = self.generate_script(
-        self.ip_input.text().strip(),
-        self.port_input.text().strip(),
-        path
-      )
-      # Упаковка в .exe
-      if await self.package_to_exe(script_path, path):
-        QMessageBox.information(self, "Успех", "Скрипт успешно упакован в .exe!")
-        # Закрываем текущее окно
-        self.close()
-        # Запускаем другой скрипт (interface.py)
-        await self.run_interface_script()
-      else:
-        QMessageBox.warning(self, "Ошибка", "Ошибка при упаковке скрипта")
-    except Exception as e:
-      QMessageBox.critical(self, "Ошибка", f"Ошибка: {e}")
+    '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
+
 
   @asyncSlot()
   async def run_interface_script(self):
