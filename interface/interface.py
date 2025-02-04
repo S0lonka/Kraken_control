@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
     self.clear_content()
 
     self.terminal_input = QLineEdit()
-    self.terminal_input.setPlaceholderText('Введите команду для терминала')
+    self.terminal_input.setPlaceholderText('Введите команду для терминала, ОСОБЫЕ команды начинаются с "/"')
     self.terminal_output = QTextEdit()
     self.terminal_output.setReadOnly(True)
 
@@ -146,18 +146,23 @@ class MainWindow(QMainWindow):
     command = self.terminal_input.text()
     self.terminal_input.clear()
 
-    if command == "connect":
+    # Обработка ОСОБЫХ команд
+    if command == "/connect":
       if not self.server_running:
         self.server_running = True
         self.terminal_output.append("Сервер запущен на 127.0.0.1:65432\n")
 
-    elif command == "disconnect":
+    elif command == "/disconnect":
       if self.server_running:
         self.server_running = False
         self.terminal_output.append("Сервер остановлен\n")
         # Здесь можно добавить код для остановки сервера
       else:
         self.terminal_output.append("Сервер не был запущен\n")
+    
+    # Обработка НЕ ОСОБЫХ команд
+    else:
+      self.terminal_output.append(f"Введена команда: {command}\n")
 
   #! Видео
   @asyncSlot()
