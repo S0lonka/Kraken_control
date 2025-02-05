@@ -153,15 +153,15 @@ class MainWindow(QMainWindow):
     if command == "/connect":
       if not self.server_running:
         self.server_running = True
-        self.terminal_output.append("Сервер запущен на 127.0.0.1:65432\n")
+        self.terminal_output.append("<font color='red'>Сервер запущен на 127.0.0.1:65432</font>\n")
 
     elif command == "/disconnect":
       if self.server_running:
         self.server_running = False
-        self.terminal_output.append("Сервер остановлен\n")
+        self.terminal_output.append("<font color='red'>Сервер остановлен</font>\n")
         # Здесь можно добавить код для остановки сервера
       else:
-        self.terminal_output.append("Сервер не был запущен\n")
+        self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
     
     # Обработка НЕ ОСОБЫХ команд
     else:
@@ -622,12 +622,29 @@ class StartWindow(MainWindow):
 
 
 if __name__ == "__main__":
-  app = QApplication(sys.argv)
-  loop = QEventLoop(app)
-  asyncio.set_event_loop(loop)
+  #! просто для быстрых тестов( для разрабов) выбор нужного интерфейса
+  cmd_quest = input("main or start\n> ")
 
-  start_window = StartWindow()
-  start_window.show()
+  # Основной интерфейс
+  if cmd_quest == "main":
+    app = QApplication(sys.argv)
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
 
-  with loop:
-    loop.run_forever()
+    main_window = MainWindow()
+    main_window.show()
+
+    with loop:
+      loop.run_forever()
+
+  # Начальный интерфейс
+  elif cmd_quest == "start":
+    app = QApplication(sys.argv)
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
+    start_window = StartWindow()
+    start_window.show()
+
+    with loop:
+      loop.run_forever()
