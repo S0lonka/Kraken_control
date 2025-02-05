@@ -11,7 +11,7 @@ from qasync import asyncSlot, QEventLoop
 
 
 
-
+#! Класс Основного окна
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -396,7 +396,28 @@ class MainWindow(QMainWindow):
       self.content_layout.itemAt(i).widget().setParent(None)
 
 
-class MainWindow(QMainWindow):
+  def validate_ip(self, ip):
+    """
+    Проверяет корректность IP-адреса.
+    """
+    parts = ip.split(".")
+    if len(parts) != 4:
+      return False
+    for part in parts:
+      try:
+        num = int(part)
+        if num < 0 or num > 255:
+          return False
+      except ValueError:
+        return False
+    return True
+
+
+
+
+
+#! Класс Стартового окна
+class StartWindow(MainWindow):
   def __init__(self):
     super().__init__()
     # Настройка основного окна
@@ -526,23 +547,6 @@ class MainWindow(QMainWindow):
     if path:
       self.path_input.setText(path)
 
-  def validate_ip(self, ip):
-    """
-    Проверяет корректность IP-адреса.
-    """
-    parts = ip.split(".")
-    if len(parts) != 4:
-      return False
-    for part in parts:
-      try:
-        num = int(part)
-        if num < 0 or num > 255:
-          return False
-      except ValueError:
-        return False
-    return True
-
-
 
   @asyncSlot()
   async def create_database(self):
@@ -560,22 +564,24 @@ class MainWindow(QMainWindow):
       QMessageBox.warning(self, "Ошибка", "Выберите путь для создания файла")
       return
 
+
     # Показываем сообщение о начале загрузки
-    QMessageBox.information(self, "Информация", "Загрузка .exe client началась, не закрывайте окно")
-
+    QMessageBox.information(self, "Информация", "Загрузка .exe client начнётся после нажатия ОК, не закрывайте окно")
+    
     '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
+    #todo Запуск Терминала
+    await self.run_MainWindow()
 
 
+  #TODO: Функция Смены окон и открытия основного
   @asyncSlot()
-  async def run_interface_script(self):
-    """
-    Запускает другой скрипт (interface.py).
-    """
-    try:
-      process = await asyncio.create_subprocess_exec(sys.executable, "interface.py")
-      await process.wait()
-    except Exception as e:
-      QMessageBox.critical(self, "Ошибка", f"Не удалось запустить interface.py: {e}")
+  async def run_MainWindow(self):
+    # Скрываем нынешнее окно
+    self.hide()
+    # Создаём и отображаем новое окно
+    self.main_window = MainWindow()
+    self.main_window.show()
+
 
   @asyncSlot()
   async def connect_to_db(self):
@@ -620,8 +626,8 @@ if __name__ == "__main__":
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  window = MainWindow()
-  window.show()
+  start_window = StartWindow()
+  start_window.show()
 
   with loop:
     loop.run_forever()
