@@ -122,6 +122,9 @@ class MainWindow(QMainWindow):
     # Переменная для хранения состояния сервера
     self.server_running = False
 
+
+
+
   #! Терминал
   @asyncSlot()
   async def show_terminal(self):
@@ -140,6 +143,8 @@ class MainWindow(QMainWindow):
 
     self.terminal_input.returnPressed.connect(self.execute_command)
 
+
+
   #* Обработка команд
   @asyncSlot()
   async def execute_command(self):
@@ -149,12 +154,33 @@ class MainWindow(QMainWindow):
     command = self.terminal_input.text()
     self.terminal_input.clear()
 
-    # Обработка ОСОБЫХ команд
-    if command == "/connect":
+    self.terminal_output.append(f"<font color='lightBlue'>[username@kraken ~] $</font> {command}\n")
+
+    #! Обработка ОСОБЫХ команд
+    # Команда показа подсказок
+    if command == "/help":
+      self.terminal_output.append('''
+      /con_info                  Информация о подключении
+
+      /connect                  Подключиться к клиенту
+
+      /disconnect                  Отключиться от клиента
+      ''')
+
+    # Команда получения информации о подключении
+    elif command == "/con_info":
+      if self.server_running:
+        self.terminal_output.append("Статус подключения: <font color='green'>ПОДКЛЮЧЕН</font>")
+      elif self.server_running:
+        self.terminal_output.append("Статус подключения: <font color='red'>ОТКЛЮЧЕН</font>")
+
+    # Команда подключения сервера
+    elif command == "/connect":
       if not self.server_running:
         self.server_running = True
-        self.terminal_output.append("<font color='red'>Сервер запущен на 127.0.0.1:65432</font>\n")
+        self.terminal_output.append("<font color='green'>Сервер запущен на 127.0.0.1:65432</font>\n")
 
+    # Команда отключения от сервера
     elif command == "/disconnect":
       if self.server_running:
         self.server_running = False
@@ -162,10 +188,19 @@ class MainWindow(QMainWindow):
         # Здесь можно добавить код для остановки сервера
       else:
         self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
-    
-    # Обработка НЕ ОСОБЫХ команд
+
+
+
+    #* Обработка НЕ ОСОБЫХ команд
     else:
-      self.terminal_output.append(f"Введена команда: {command}\n")
+      # Если сервер подключён выполнять команды
+      if self.server_running:
+        self.terminal_output.append(f"Введена команда: {command}\n")
+        '''Здесь должна будет быть функция работы сервера'''
+      else:
+        self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
+
+
 
   #! Видео
   @asyncSlot()
