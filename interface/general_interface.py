@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
-import discordrp
+# import discordrp
 import logging
 
 logging.basicConfig(
@@ -192,7 +192,9 @@ class MainWindow(QMainWindow):
     except Exception as e:
       self.terminal_output.append(f"если ты это видишь, видимо ты где-то облажался, rest and peace")
       self.terminal_output.insertHtml(f"<font color='red'>{e}</font><br>")
-  
+
+
+
   #* Обработка команд
   @asyncSlot()
   async def execute_command(self):
@@ -211,60 +213,62 @@ class MainWindow(QMainWindow):
 
     # Обработка ОСОБЫХ команд
     if command == "/help":
-        logging.info("Обработка команды /help")
-        self.terminal_output.append('''
-        /con_info                  Информация о подключении
-        /connect                  Подключиться к клиенту
-        /disconnect                  Отключиться от клиента
-        ''')
+      logging.info("Обработка команды /help")
+      self.terminal_output.append('''
+      /con_info                  Информация о подключении
+      /connect                  Подключиться к клиенту
+      /disconnect                  Отключиться от клиента
+      ''')
 
     elif command == "/con_info":
-        logging.info("Обработка команды /con_info")
-        logging.debug("Проверяем статус подключения")
-        logging.debug(f"Текущий статус подключения: {self.server_running}")
-        if self.server_running:
-            self.terminal_output.append("Статус подключения: <font color='green'>ПОДКЛЮЧЕН</font>")
-        else:
-            self.terminal_output.append("Статус подключения: <font color='red'>ОТКЛЮЧЕН</font>")
+      logging.info("Обработка команды /con_info")
+      logging.debug("Проверяем статус подключения")
+      logging.debug(f"Текущий статус подключения: {self.server_running}")
+      if self.server_running:
+        self.terminal_output.append("Статус подключения: <font color='green'>ПОДКЛЮЧЕН</font>")
+      else:
+        self.terminal_output.append("Статус подключения: <font color='red'>ОТКЛЮЧЕН</font>")
 
     elif command == "/connect":
-        logging.info("Обработка команды /connect")
-        logging.debug("Проверяем статус подключения")
-        logging.debug(f"Текущий статус подключения: {self.server_running}")
-        if not self.server_running:
-            self.server_running = True
-            self.terminal_output.append("<font color='green'>Сервер запущен на 127.0.0.1:65432</font>\n")
-            logging.debug("Запускаем сервер")
-            self.server = await asyncio.start_server(self.handle_client, '127.0.0.1', 65432)
-        else:
-            self.terminal_output.append("\n<font color='lightblue'>Сервер уже был запущен</font>\n")
+      logging.info("Обработка команды /connect")
+      logging.debug("Проверяем статус подключения")
+      logging.debug(f"Текущий статус подключения: {self.server_running}")
+      if not self.server_running:
+        self.server_running = True
+        self.terminal_output.append("<font color='green'>Сервер запущен на 127.0.0.1:65432</font>\n")
+        logging.debug("Запускаем сервер")
+        self.server = await asyncio.start_server(self.handle_client, '127.0.0.1', 65432)
+      else:
+        self.terminal_output.append("\n<font color='lightblue'>Сервер уже был запущен</font>\n")
 
     elif command == "/disconnect":
-        logging.info("Обработка команды /disconnect")
-        if self.server_running:
-            self.server_running = False
-            self.terminal_output.append("<font color='red'>Сервер остановлен</font>\n")
-            logging.debug("Останавливаем сервер")
-            self.server.close()
-            await self.server.wait_closed()
-        else:
-            self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
+      logging.info("Обработка команды /disconnect")
+      if self.server_running:
+        self.server_running = False
+        self.terminal_output.append("<font color='red'>Сервер остановлен</font>\n")
+        logging.debug("Останавливаем сервер")
+        self.server.close()
+        await self.server.wait_closed()
+      else:
+        self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
+
+
 
     # Обработка НЕ ОСОБЫХ команд
     else:
-        logging.info("Обработка обычной команды")
-        if self.server_running:
-            logging.debug("Сервер подключен, передаем команду клиенту")
-            self.terminal_output.append(f"Введена команда: {command}\n")
-            try:
-                self.writer.write(command.encode())
-                logging.debug("Команда успешно отправлена клиенту")
-            except AttributeError as e:
-                logging.error(f"Ошибка при отправке команды: {e}")
-                self.terminal_output.append(f"<font color='red'>Ошибка: {e}</font> - возможно клиент еще не подключен либо версия ПО у клиента и сервера отличаются\n")
-        else:
-            logging.warning("Сервер не подключен, команда не может быть обработана")
-            self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
+      logging.info("Обработка обычной команды")
+      if self.server_running:
+        logging.debug("Сервер подключен, передаем команду клиенту")
+        self.terminal_output.append(f"Введена команда: {command}\n")
+        try:
+          self.writer.write(command.encode())
+          logging.debug("Команда успешно отправлена клиенту")
+        except AttributeError as e:
+          logging.error(f"Ошибка при отправке команды: {e}")
+          self.terminal_output.append(f"<font color='red'>Ошибка: {e}</font> - возможно клиент еще не подключен либо версия ПО у клиента и сервера отличаются\n")
+      else:
+        logging.warning("Сервер не подключен, команда не может быть обработана")
+        self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
     
   #! Видео
   @asyncSlot()
