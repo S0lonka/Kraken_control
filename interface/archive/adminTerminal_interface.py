@@ -5,9 +5,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QFont, QIcon
 from qasync import QEventLoop, asyncSlot
 
+
+
 class Terminal(QTextEdit):
-  def init(self):
-    super().init()
+  def __init__(self):
+    super().__init__()
     self.setFont(QFont("Courier", 10))
     self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
     self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -45,8 +47,8 @@ class Terminal(QTextEdit):
     self.setTextCursor(cursor)
 
 class TerminalWindow(QWidget):
-  def init(self):
-    super().init()
+  def __init__(self):
+    super().__init__()
     self.initUI()
 
   def initUI(self):
