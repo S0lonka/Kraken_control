@@ -175,6 +175,7 @@ class MainWindow(QMainWindow):
     self.terminal_output.append(warning_message)
     logging.info("Предупреждение отображено в терминале")
 
+  # Функция подключения к clitnt
   async def handle_client(self, reader, writer):
     logging.debug("сопряжение с клиентом прошло успешно")
     self.reader = reader
@@ -285,6 +286,7 @@ class MainWindow(QMainWindow):
       else:
         logging.warning("Сервер не подключен, команда не может быть обработана")
         self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
+
 
 
 
@@ -553,6 +555,10 @@ class MainWindow(QMainWindow):
 
 
 
+
+
+
+
 #! Класс Стартового окна
 class StartWindow(MainWindow):
   def __init__(self):
@@ -806,6 +812,11 @@ class Terminal(QTextEdit):
     self.append("> ")
     cursor.movePosition(QTextCursor.End)
     self.setTextCursor(cursor)
+
+
+
+
+
 
 
 #! ОКНО С АДМИН ТЕРМИНАЛОМ
