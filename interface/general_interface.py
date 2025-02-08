@@ -279,7 +279,10 @@ class MainWindow(QMainWindow):
       else:
         logging.warning("Сервер не подключен, команда не может быть обработана")
         self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
-    
+
+
+
+
   #! Видео
   @asyncSlot()
   async def show_video(self):
@@ -429,9 +432,13 @@ class MainWindow(QMainWindow):
     ip = self.ip_input.text().strip()
     port = self.port_input.text().strip()
 
+    # Проверяем что ip введён правильно
+    if not self.validate_ip(ip):
+      QMessageBox.warning(self, "Ошибка", "Некорректный IP")
+      return
     # Проверяем, что все поля заполнены
     if not name or not ip or not port:
-      print("Все поля должны быть заполнены")
+      QMessageBox.warning(self, "Ошибка", "Все поля должны быть заполнены")
       return
 
     # Добавляем данные в базу данных
