@@ -198,7 +198,7 @@ class MainWindow(QMainWindow):
       self.terminal_output.insertHtml(f"<font color='red'>{e}</font><br>")
     finally:
         # Закрытие соединения
-        logging.info(f"Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}")
+        logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
         writer.close()
         await writer.wait_closed()
 
@@ -903,38 +903,33 @@ if __name__ == "__main__":
     with open("kraken.log", 'w') as file:
       pass
 
-
-
-
-  #! просто для быстрых тестов( для разрабов) выбор нужного интерфейса
   cmd_quest = input("main or start\n> ")
 
-  # Основной интерфейс
-  if cmd_quest == "main":
-    app = QApplication(sys.argv)
-    loop = QEventLoop(app)
-    asyncio.set_event_loop(loop)
+  app = QApplication(sys.argv)
+  loop = QEventLoop(app)
+  asyncio.set_event_loop(loop)
 
-    # ОТОБРАЖЕНИЕ ОКНА С ЛИЦЕНЗИОННЫМ СОГЛАШЕНИЕМ
+  #! Команды для разработчиков(быстрая отладка)
+  # Запуск основного окна
+  if cmd_quest == "main":
+    #* Проверка что в окне с лицензии, пользователь подтвердил соглашение
     if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+      # Запуск окна
       main_window = MainWindow()
       main_window.show()
 
+      with loop:
+        loop.run_forever()
+    else:
+      sys.exit()  # Завершаем программу, если лицензия не принята
 
-
-    with loop:
-      loop.run_forever()
-
-  # Начальный интерфейс
+  # Запуск начального окна
   elif cmd_quest == "start":
-    app = QApplication(sys.argv)
-    loop = QEventLoop(app)
-    asyncio.set_event_loop(loop)
-
-    # ОТОБРАЖЕНИЕ ОКНА С ЛИЦЕНЗИОННЫМ СОГЛАШЕНИЕМ
     if LicenseAgreementDialog().exec_() == QDialog.Accepted:
       start_window = StartWindow()
       start_window.show()
 
-    with loop:
-      loop.run_forever()
+      with loop:
+        loop.run_forever()
+    else:
+      sys.exit()  # Завершаем программу, если лицензия не принята
