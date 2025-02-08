@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit, QMessageBox, QFileDialog)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QTextCursor, QFont
 from qasync import asyncSlot, QEventLoop
 # import discordrp
 import logging
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
 
 
 
-  #* Обработка команд
+  #! Обработка команд
   @asyncSlot()
   async def execute_command(self):
     """
@@ -217,10 +217,11 @@ class MainWindow(QMainWindow):
       logging.info("Обработка команды /help")
       self.terminal_output.append('''
       /con_info                  Информация о подключении
-      /connect                  Подключиться к клиенту
-      /disconnect                  Отключиться от клиента
+      /connect                   Подключиться к клиенту
+      /disconnect                Отключиться от клиента
       ''')
 
+    # Узнать состояние подключения
     elif command == "/con_info":
       logging.info("Обработка команды /con_info")
       logging.debug("Проверяем статус подключения")
@@ -230,6 +231,7 @@ class MainWindow(QMainWindow):
       else:
         self.terminal_output.append("Статус подключения: <font color='red'>ОТКЛЮЧЕН</font>")
 
+    # Подключиться к серверу
     elif command == "/connect":
       logging.info("Обработка команды /connect")
       logging.debug("Проверяем статус подключения")
@@ -242,6 +244,7 @@ class MainWindow(QMainWindow):
       else:
         self.terminal_output.append("\n<font color='lightblue'>Сервер уже был запущен</font>\n")
 
+    # Отключиться от сервера
     elif command == "/disconnect":
       logging.info("Обработка команды /disconnect")
       if self.server_running:
@@ -252,6 +255,12 @@ class MainWindow(QMainWindow):
         await self.server.wait_closed()
       else:
         self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
+
+    # Вызов админ терминала
+    elif command == "/terminal -A":
+      self.admin_terminal = TerminalWindow()
+      self.admin_terminal.show()
+
 
 
 
@@ -734,6 +743,100 @@ class StartWindow(MainWindow):
       widget = self.main_layout.itemAt(i).widget()
       if widget:
         widget.setParent(None)
+
+
+
+
+
+
+#! Терминал внутри ОКНА С ТЕРМИНАЛОМ
+class Terminal(QTextEdit):
+  def __init__(self):
+    super().__init__()
+    self.setFont(QFont("Courier", 10))
+    self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+    self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    self.setLineWrapMode(QTextEdit.NoWrap)
+    self.setReadOnly(False)
+    self.setText("> ")
+    self.cursor = self.textCursor()
+    self.cursor.movePosition(QTextCursor.End)
+    self.setTextCursor(self.cursor)
+
+  def keyPressEvent(self, event):
+    if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+      self.process_command()
+    else:
+      super().keyPressEvent(event)
+
+  @asyncSlot()
+  async def process_command(self):
+    cursor = self.textCursor()
+    cursor.movePosition(QTextCursor.End)
+    cursor.select(QTextCursor.LineUnderCursor)
+    command = cursor.selectedText()[2:]  # Убираем "> " из команды
+    cursor.movePosition(QTextCursor.End)
+    cursor.insertText("\n")
+
+    if command == "/help":
+      self.append("Available commands:\n/help - Show this help message")
+    else:
+      # Пример асинхронной операции
+      await asyncio.sleep(1)  # Имитация долгой операции
+      self.append(f"Unknown command: {command}")
+
+    self.append("> ")
+    cursor.movePosition(QTextCursor.End)
+    self.setTextCursor(cursor)
+
+
+#! ОКНО С АДМИН ТЕРМИНАЛОМ
+class TerminalWindow(QWidget):
+  def __init__(self):
+    super().__init__()
+    self.initUI()
+
+  def initUI(self):
+    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
+    self.setWindowTitle("KRAKEN - ADMIN TERMINAL")
+    self.setGeometry(100, 100, 800, 600)
+
+    # Устанавливаем стили для всего окна и его элементов
+    self.setStyleSheet("""
+      QWidget {
+        background-color: #2E3440;  /* Темно-серый фон */
+        color: #ECEFF4;  /* Белый текст */
+      }
+      QTextEdit {
+        background-color: #3B4252;  /* Более светлый фон для текстового поля */
+        color: #ECEFF4;  /* Белый текст */
+        border: 1px solid #4C566A;  /* Граница */
+        padding: 5px;
+      }
+      QScrollBar:vertical {
+        background-color: #3B4252;  /* Фон скроллбара */
+        width: 12px;
+        margin: 0px;
+      }
+      QScrollBar::handle:vertical {
+        background-color: #4C566A;  /* Цвет ползунка */
+        min-height: 20px;
+        border-radius: 6px;
+      }
+      QScrollBar::add-line:vertical,
+      QScrollBar::sub-line:vertical {
+        background: none;
+      }
+      QScrollBar::add-page:vertical,
+      QScrollBar::sub-page:vertical {
+        background: none;
+      }
+    """)
+
+    layout = QVBoxLayout()
+    self.terminal = Terminal()
+    layout.addWidget(self.terminal)
+    self.setLayout(layout)
 
 
 if __name__ == "__main__":
