@@ -174,7 +174,7 @@ class MainWindow(QMainWindow):
     logging.info("Предупреждение отображено в терминале")
 
   async def handle_client(self, reader, writer):
-    logging.debug("сопряжение с клиентом удачна")
+    logging.debug("сопряжение с клиентом прошло успешно")
     self.reader = reader
     self.writer = writer
     self.terminal_output.append(f'{self.writer.get_extra_info("peername")} подключился к серверу\n')
