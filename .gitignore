@@ -7,4 +7,9 @@ sqlite.db
 
 # игнорирование всех .txt файлов
 *.txt
+
+
 kraken.log
+
+# Появляется при импорте своих файлов
+interface/__pycache__
