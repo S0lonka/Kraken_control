@@ -12,9 +12,6 @@ async def client(host, port):
       break
     # получаем команду и выводим в командную строку
     result = subprocess.run(data.decode(), shell=True, capture_output=True, text=True)
-    # закидываем в буфер
-    writer.write((result.stdout if result.stdout else f"Ошибка!: {result.stderr}").encode())
-    # отправляем сокету и чистим бувер
     await writer.drain()
 
 if __name__ == "__main__":
