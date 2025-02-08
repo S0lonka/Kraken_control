@@ -7,3 +7,4 @@ sqlite.db
 
 # игнорирование всех .txt файлов
 *.txt
+kraken.log
