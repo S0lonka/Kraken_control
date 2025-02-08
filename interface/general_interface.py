@@ -1,3 +1,4 @@
+import os
 import sys
 import sqlite3
 import asyncio
@@ -736,6 +737,12 @@ class StartWindow(MainWindow):
 
 
 if __name__ == "__main__":
+  # Очистка логов (удаление файла)
+  if os.path.exists("kraken.log"):
+    # Очищаем файл
+    with open("kraken.log", 'w') as file:
+      pass
+
   #! просто для быстрых тестов( для разрабов) выбор нужного интерфейса
   cmd_quest = input("main or start\n> ")
 
