@@ -4,12 +4,14 @@ import sqlite3
 import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
-                             QTableWidgetItem, QLineEdit, QMessageBox, QFileDialog)
+                             QTableWidgetItem, QLineEdit, QMessageBox, QFileDialog, QCheckBox, QDialog)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap, QTextCursor, QFont
 from qasync import asyncSlot, QEventLoop
 # import discordrp
 import logging
+
+from licenseTxt import license_agreement
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -551,12 +553,15 @@ class MainWindow(QMainWindow):
 class StartWindow(MainWindow):
   def __init__(self):
     super().__init__()
+
     # Настройка основного окна
     self.setWindowTitle("KRAKEN - System control")
+
     # Иконка приложения
-    icon_path = "img/imgReadme/kraken.jpg" 
-    self.setWindowIcon(QIcon(icon_path))
+    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
+
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
+
     # Применяем стили
     self.setStyleSheet("""
       QWidget {
@@ -604,7 +609,7 @@ class StartWindow(MainWindow):
     self.title_label = QLabel("Hack with KRAKEN")
     self.title_label.setAlignment(Qt.AlignCenter)
     self.main_layout.addWidget(self.title_label)
-    # Логотип (замените путь на ваш логотип)
+    # Логотип
     self.logo_label = QLabel()
     self.logo_label.setPixmap(QPixmap("img/imgReadme/kraken.jpg").scaled(200, 200, Qt.KeepAspectRatio))
     self.logo_label.setAlignment(Qt.AlignCenter)
@@ -634,6 +639,7 @@ class StartWindow(MainWindow):
     self.main_layout.addWidget(self.create_button)
     self.main_layout.addWidget(self.connect_button)
 
+  #* Создаём клиент(ввод данных)
   @asyncSlot()
   async def create_interface(self):
     """
@@ -669,6 +675,7 @@ class StartWindow(MainWindow):
     self.create_db_button.clicked.connect(self.create_database)
     self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignCenter)
 
+  # Выбор пути для сохранения файла
   @asyncSlot()
   async def select_path(self):
     """
@@ -678,7 +685,7 @@ class StartWindow(MainWindow):
     if path:
       self.path_input.setText(path)
 
-
+  # Создание клиента
   @asyncSlot()
   async def create_database(self):
     """
@@ -846,12 +853,54 @@ class TerminalWindow(QWidget):
     self.setLayout(layout)
 
 
+#! Лицензионное соглашение
+class LicenseAgreementDialog(QDialog):
+  def __init__(self):
+    super().__init__()
+    self.initUI()
+
+  def initUI(self):
+    self.setWindowTitle('Лицензионное соглашение')
+    self.setGeometry(100, 100, 600, 400)
+
+    layout = QVBoxLayout()
+
+    self.text_edit = QTextEdit(self)
+    # Тест нашего соглашения
+    self.text_edit.setPlainText(license_agreement)
+    # Можно только читать
+    self.text_edit.setReadOnly(True)
+    layout.addWidget(self.text_edit)
+
+    self.checkbox = QCheckBox("Я соглашаюсь с условиями лицензионного соглашения", self)
+    self.checkbox.stateChanged.connect(self.on_checkbox_changed)
+    layout.addWidget(self.checkbox)
+
+    self.next_button = QPushButton("Далее", self)
+    self.next_button.setEnabled(False)
+    self.next_button.clicked.connect(self.accept)  # Закрываем диалог с результатом Accepted
+    layout.addWidget(self.next_button)
+
+    self.setLayout(layout)
+
+  def on_checkbox_changed(self, state):
+    if state == 2:  # 2 означает, что галочка поставлена
+      self.next_button.setEnabled(True)
+    else:
+      self.next_button.setEnabled(False)
+
+
+
+#! ЗАПУСК ПРОГРАММЫ
 if __name__ == "__main__":
   # Очистка логов (удаление файла)
   if os.path.exists("kraken.log"):
     # Очищаем файл
     with open("kraken.log", 'w') as file:
       pass
+
+
+
 
   #! просто для быстрых тестов( для разрабов) выбор нужного интерфейса
   cmd_quest = input("main or start\n> ")
@@ -862,8 +911,12 @@ if __name__ == "__main__":
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
 
-    main_window = MainWindow()
-    main_window.show()
+    # ОТОБРАЖЕНИЕ ОКНА С ЛИЦЕНЗИОННЫМ СОГЛАШЕНИЕМ
+    if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+      main_window = MainWindow()
+      main_window.show()
+
+
 
     with loop:
       loop.run_forever()
@@ -874,8 +927,10 @@ if __name__ == "__main__":
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
 
-    start_window = StartWindow()
-    start_window.show()
+    # ОТОБРАЖЕНИЕ ОКНА С ЛИЦЕНЗИОННЫМ СОГЛАШЕНИЕМ
+    if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+      start_window = StartWindow()
+      start_window.show()
 
     with loop:
       loop.run_forever()
