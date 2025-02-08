@@ -91,7 +91,7 @@ class TerminalWindow(QWidget):
     layout.addWidget(self.terminal)
     self.setLayout(layout)
 
-if name == "main":
+if __name__ == "__main__":
   app = QApplication(sys.argv)
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
