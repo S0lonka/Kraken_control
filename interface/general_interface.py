@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
-
+import discordrp
 
 
 
@@ -121,7 +121,7 @@ class MainWindow(QMainWindow):
 
     # Переменная для хранения состояния сервера
     self.server_running = False
-
+    self.clientid = "1337766338621607997"
 
 
 
@@ -142,9 +142,30 @@ class MainWindow(QMainWindow):
     self.content_layout.addWidget(self.terminal_output)
 
     self.terminal_input.returnPressed.connect(self.execute_command)
+    self.terminal_output.append("""<font color='red'>Внимание!</font>\n
+Данное программное обеспечение разработано исключительно в образовательных целях и для тестирования системной безопасности с разрешения владельца системы.
+Незаконное или несанкционированное использование может нарушать законы и привести к уголовной или административной ответственности.
+Разработчики не несут ответственности за любые последствия использования данного ПО.
 
+Помните: безопасность начинается с ответственности!
+бог любит вас.""")
 
-
+  async def handle_client(self, reader, writer):
+    self.reader = reader
+    self.writer = writer
+    self.terminal_output.append('метод удержания клиента, ждем получения ответа от клиента..')
+    try:
+      while True:
+        self.data = await self.reader.read(100)
+        if not self.data:
+          self.terminal_output.append('Клиент отключился, rest and peace')
+          break
+        self.message = self.data.decode().strip()
+        print(f"{self.message}")
+        await writer.drain()
+    except:
+      print("если ты это видишь, видимо ты где-то облажался, rest and peace")
+  
   #* Обработка команд
   @asyncSlot()
   async def execute_command(self):
@@ -179,12 +200,16 @@ class MainWindow(QMainWindow):
       if not self.server_running:
         self.server_running = True
         self.terminal_output.append("<font color='green'>Сервер запущен на 127.0.0.1:65432</font>\n")
+        self.server = await asyncio.start_server(self.handle_client, '127.0.0.1', 65432)
+        
 
     # Команда отключения от сервера
     elif command == "/disconnect":
       if self.server_running:
         self.server_running = False
         self.terminal_output.append("<font color='red'>Сервер остановлен</font>\n")
+        self.server.close()
+        await self.server.wait_closed()
         # Здесь можно добавить код для остановки сервера
       else:
         self.terminal_output.append("<font color='red'>Сервер не был запущен</font>\n")
@@ -196,12 +221,11 @@ class MainWindow(QMainWindow):
       # Если сервер подключён выполнять команды
       if self.server_running:
         self.terminal_output.append(f"Введена команда: {command}\n")
-        '''Здесь должна будет быть функция работы сервера'''
+        self.writer.write(command.encode())
       else:
         self.terminal_output.append(f"<font color='red'>Команда {command} не обработана т.к. сервер не подключен</font>\n")
 
-
-
+    
   #! Видео
   @asyncSlot()
   async def show_video(self):
