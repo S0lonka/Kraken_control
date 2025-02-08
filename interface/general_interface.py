@@ -183,19 +183,24 @@ class MainWindow(QMainWindow):
     try:
       while True:
         logging.debug("обрабатываем запросы клиента")
-        self.data = await self.reader.read(100)
+        self.data = await self.reader.read(4096)
         if not self.data:
           logging.info("данные пустые, клиент возможно отключился")
           self.terminal_output.append('Клиент отключился, rest and peace')
           break
         self.message = self.data.decode().strip()
         logging.info(f"получено сообщение: {self.message}")
+        self.terminal_output.append(self.message)
         print(f"{self.message}")
         await writer.drain()
     except Exception as e:
       self.terminal_output.append(f"если ты это видишь, видимо ты где-то облажался, rest and peace")
       self.terminal_output.insertHtml(f"<font color='red'>{e}</font><br>")
-
+    finally:
+        # Закрытие соединения
+        logging.info(f"Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}")
+        writer.close()
+        await writer.wait_closed()
 
 
   #! Обработка команд
@@ -271,7 +276,6 @@ class MainWindow(QMainWindow):
       logging.info("Обработка обычной команды")
       if self.server_running:
         logging.debug("Сервер подключен, передаем команду клиенту")
-        self.terminal_output.append(f"Введена команда: {command}\n")
         try:
           self.writer.write(command.encode())
           logging.debug("Команда успешно отправлена клиенту")

