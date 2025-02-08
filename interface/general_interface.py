@@ -186,7 +186,7 @@ class MainWindow(QMainWindow):
           logging.info("данные пустые, клиент возможно отключился")
           self.terminal_output.append('Клиент отключился, rest and peace')
           break
-        self.message = self.data.decode().strip()
+        self.message = self.data.decode("utf-8").strip()
         logging.info(f"получено сообщение: {self.message}")
         self.terminal_output.append(self.message)
         print(f"{self.message}")
@@ -275,7 +275,7 @@ class MainWindow(QMainWindow):
       if self.server_running:
         logging.debug("Сервер подключен, передаем команду клиенту")
         try:
-          self.writer.write(command.encode())
+          self.writer.write(command.encode("utf-8"))
           logging.debug("Команда успешно отправлена клиенту")
         except AttributeError as e:
           logging.error(f"Ошибка при отправке команды: {e}")
