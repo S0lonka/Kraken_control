@@ -9,7 +9,7 @@ from qasync import asyncSlot, QEventLoop
 
 # Импорты моих библиотек
 from main_interface import MainWindow
-from interfaces.license_interface import LicenseAgreementDialog
+from license_interface import LicenseAgreementDialog
 
 
 #! Класс Стартового окна
@@ -21,7 +21,7 @@ class StartWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
+    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
 
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
 
@@ -74,7 +74,7 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.title_label)
     # Логотип
     self.logo_label = QLabel()
-    self.logo_label.setPixmap(QPixmap("img/imgReadme/kraken.jpg").scaled(200, 200, Qt.KeepAspectRatio))
+    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme/kraken.jpg").scaled(200, 200, Qt.KeepAspectRatio))
     self.logo_label.setAlignment(Qt.AlignCenter)
     self.main_layout.addWidget(self.logo_label)
     # Кнопка START

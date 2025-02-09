@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QVBoxLayout, QPushButton, QTextEdit, QCheckBox, QDialog, QApplication, QLabel)
 import sys
 # Импорт текста соглашения
-from app.utils import license_agreement
+from utils import license_agreement
 
 #! Лицензионное соглашение
 class LicenseAgreementDialog(QDialog):

@@ -14,8 +14,8 @@ import logging
 
 # Импорты моих модулей
 from adminTerminal_interface import TerminalWindow
-from myLicense.license_interface import LicenseAgreementDialog
-from additional_texts.additional_text import symbol, warning_message
+from license_interface import LicenseAgreementDialog
+from utils import symbol, warning_message
 
 
 logging.basicConfig(
@@ -37,8 +37,7 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    icon_path = "img/imgReadme/kraken.jpg" 
-    self.setWindowIcon(QIcon(icon_path))
+    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
 
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
@@ -227,6 +226,7 @@ class MainWindow(QMainWindow):
       /con_info                  Информация о подключении
       /connect                   Подключиться к клиенту
       /disconnect                Отключиться от клиента
+      /terminal -A               Вызов админ панели
       ''')
 
     # Узнать состояние подключения
