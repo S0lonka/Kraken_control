@@ -13,7 +13,7 @@ import logging
 
 # Импорты моих модулей
 from adminTerminal_interface import TerminalWindow
-from license_interface import LicenseAgreementDialog
+from myLicense.license_interface import LicenseAgreementDialog
 
 logging.basicConfig(
     level=logging.DEBUG,
