@@ -8,8 +8,8 @@ from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
 
 # Импорты моих библиотек
-from main_interface import MainWindow
-from license_interface import LicenseAgreementDialog
+from .main_interface import MainWindow
+from .license_interface import LicenseAgreementDialog
 
 
 #! Класс Стартового окна

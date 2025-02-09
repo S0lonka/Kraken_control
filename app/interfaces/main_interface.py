@@ -13,9 +13,9 @@ import logging
 
 
 # Импорты моих модулей
-from adminTerminal_interface import TerminalWindow
-from license_interface import LicenseAgreementDialog
-from utils import symbol, warning_message
+from .adminTerminal_interface import TerminalWindow
+from .license_interface import LicenseAgreementDialog
+from .utils import symbol, warning_message
 
 
 logging.basicConfig(
