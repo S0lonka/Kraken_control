@@ -57,7 +57,7 @@ class TerminalWindow(QWidget):
     self.initUI()
 
   def initUI(self):
-    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
+    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
     self.setWindowTitle("KRAKEN - ADMIN TERMINAL")
     self.setGeometry(100, 100, 800, 600)
 
