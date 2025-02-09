@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
     self.terminal_input.clear()
 
     logging.debug("Добавляем команду в историю вывода")
-    self.terminal_output.append(f"<font color='lightBlue'>[username@kraken ~] $</font> {command}\n")
+    self.terminal_output.append(f"\n<font color='lightBlue'>[username@kraken ~] $</font> {command}\n")
 
     # Обработка ОСОБЫХ команд
     if command == "/help":
