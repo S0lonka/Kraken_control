@@ -13,3 +13,4 @@ kraken.log
 
 # Появляется при импорте своих файлов
 interface/__pycache__
+main/client/client.log
