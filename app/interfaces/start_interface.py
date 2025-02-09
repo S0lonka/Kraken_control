@@ -9,7 +9,7 @@ from qasync import asyncSlot, QEventLoop
 
 # Импорты моих библиотек
 from main_interface import MainWindow
-from myLicense.license_interface import LicenseAgreementDialog
+from utils.license_interface import LicenseAgreementDialog
 
 
 #! Класс Стартового окна
