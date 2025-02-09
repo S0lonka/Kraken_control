@@ -274,17 +274,28 @@ class MainWindow(QMainWindow):
         self.terminal_output.append("Статус подключения: <font color='red'>ОТКЛЮЧЕН</font>")
 
     # Подключиться к серверу
-    elif command == "/connect":
-      logging.info("Обработка команды /connect")
-      logging.debug("Проверяем статус подключения")
-      logging.debug(f"Текущий статус подключения: {self.server_running}")
-      if not self.server_running:
-        self.server_running = True
-        self.terminal_output.append("<font color='green'>Сервер запущен на 127.0.0.1:65432</font>\n")
-        logging.debug("Запускаем сервер")
-        self.server = await asyncio.start_server(self.handle_client, '127.0.0.1', 65432)
+    elif command.startswith("/connect"):
+      isvalid = True
+      parts = command.split()
+      if len(parts) == 3:
+        logging.info("Обработка команды /connect")
+        logging.debug("Проверяем статус подключения")
+        logging.debug(f"Текущий статус подключения: {self.server_running}")
+        if not self.server_running:
+          self.server_running = True
+          logging.debug("Запускаем сервер")
+          try:
+              self.server = await asyncio.start_server(self.handle_client, parts[1], parts[2])
+          except Exception as e:
+              isvalid = False
+              logging.error(e)
+              self.terminal_output.append(f"<font color='red'>{e}</font>")
+          if isvalid:
+            self.terminal_output.append(f"<font color='green'>Сервер запущен на {parts[1]}:{parts[2]}</font>\n")
+        else:
+          self.terminal_output.append("\n<font color='lightblue'>Сервер уже был запущен</font>\n")
       else:
-        self.terminal_output.append("\n<font color='lightblue'>Сервер уже был запущен</font>\n")
+        self.terminal_output.append("Ошибка: Неверный формат команды. Используйте /connect айпи порт")
 
     # Отключиться от сервера
     elif command == "/disconnect":
