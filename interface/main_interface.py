@@ -4,14 +4,16 @@ import sqlite3
 import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
-                             QTableWidgetItem, QLineEdit, QMessageBox, QFileDialog, QCheckBox, QDialog)
+                             QTableWidgetItem, QLineEdit, QMessageBox, QDialog)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap, QTextCursor, QFont
+from PyQt5.QtGui import QIcon
 from qasync import asyncSlot, QEventLoop
 # import discordrp
 import logging
 
-from licenseTxt import license_agreement
+# Импорты моих модулей
+from adminTerminal_interface import TerminalWindow
+from license_interface import LicenseAgreementDialog
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -603,354 +605,6 @@ class MainWindow(QMainWindow):
 
 
 
-
-#! Класс Стартового окна
-class StartWindow(MainWindow):
-  def __init__(self):
-    super().__init__()
-
-    # Настройка основного окна
-    self.setWindowTitle("KRAKEN - System control")
-
-    # Иконка приложения
-    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
-
-    self.setGeometry(350, 100, 800, 600)  # x, y, width, height
-
-    # Применяем стили
-    self.setStyleSheet("""
-      QWidget {
-        background-color: #2E3440;  /* Темно-серый фон */
-        color: #ECEFF4;  /* Белый текст */
-      }
-      QPushButton {
-        background-color: #4C566A;  /* Серый фон кнопок */
-        color: #ECEFF4;  /* Белый текст */
-        border: 1px solid #81A1C1;  /* Голубая рамка */
-        padding: 10px;
-        border-radius: 5px;
-        font-size: 16px;
-      }
-      QPushButton:hover {
-        background-color: #81A1C1;  /* Голубой фон при наведении */
-        color: #2E3440;  /* Темный текст */
-      }
-      QLabel {
-        color: #ECEFF4;  /* Белый текст */
-        font-size: 24px;
-        font-weight: bold;
-      }
-      QLineEdit {
-        background-color: #3B4252;  /* Темно-серый фон полей ввода */
-        color: #ECEFF4;  /* Белый текст */
-        border: 1px solid #81A1C1;  /* Голубая рамка */
-        padding: 5px;
-        border-radius: 3px;
-      }
-    """)
-    # Инициализация начального интерфейса
-    self.init_ui()
-
-  def init_ui(self):
-    """
-    Инициализация начального интерфейса с надписью, логотипом и кнопкой START.
-    """
-    # Создаем центральный виджет и основной layout
-    self.central_widget = QWidget()
-    self.setCentralWidget(self.central_widget)
-    self.main_layout = QVBoxLayout(self.central_widget)
-    self.main_layout.setAlignment(Qt.AlignCenter)  # Выравнивание по центру
-    # Надпись "Hack with KRAKEN"
-    self.title_label = QLabel("Hack with KRAKEN")
-    self.title_label.setAlignment(Qt.AlignCenter)
-    self.main_layout.addWidget(self.title_label)
-    # Логотип
-    self.logo_label = QLabel()
-    self.logo_label.setPixmap(QPixmap("img/imgReadme/kraken.jpg").scaled(200, 200, Qt.KeepAspectRatio))
-    self.logo_label.setAlignment(Qt.AlignCenter)
-    self.main_layout.addWidget(self.logo_label)
-    # Кнопка START
-    self.start_button = QPushButton("START")
-    self.start_button.setFixedSize(150, 50)  # Фиксированный размер кнопки
-    self.start_button.clicked.connect(self.change_interface)
-    self.main_layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
-
-  @asyncSlot()
-  async def change_interface(self):
-    """
-    Меняет интерфейс после нажатия кнопки START.
-    """
-    # Очищаем текущий интерфейс
-    self.clear_interface()
-    # Создаем две кнопки: "Создать" и "Подключиться"
-    self.create_button = QPushButton("Создать")
-    self.create_button.setFixedSize(150, 50)
-    self.create_button.clicked.connect(self.create_interface)
-    
-    self.connect_button = QPushButton("Подключиться")
-    self.connect_button.setFixedSize(150, 50)
-    self.connect_button.clicked.connect(self.connect_to_db)
-    # Добавляем кнопки в layout
-    self.main_layout.addWidget(self.create_button)
-    self.main_layout.addWidget(self.connect_button)
-
-  #* Создаём клиент(ввод данных)
-  @asyncSlot()
-  async def create_interface(self):
-    """
-    Создает интерфейс для выбора пути и ввода данных.
-    """
-    self.clear_interface()
-    
-    # Поле для выбора пути
-    self.path_layout = QHBoxLayout()
-    self.path_input = QLineEdit()
-    self.path_input.setPlaceholderText("Выберите путь для создания файла")
-    self.path_button = QPushButton("Выбрать путь")
-    self.path_button.clicked.connect(self.select_path)
-    self.path_layout.addWidget(self.path_input)
-    self.path_layout.addWidget(self.path_button)
-    self.main_layout.addLayout(self.path_layout)
-
-    # Поля ввода для Name, IP, Port
-    self.name_input = QLineEdit()
-    self.name_input.setPlaceholderText("Name")
-    self.main_layout.addWidget(self.name_input)
-
-    self.ip_input = QLineEdit()
-    self.ip_input.setPlaceholderText("IP")
-    self.main_layout.addWidget(self.ip_input)
-
-    self.port_input = QLineEdit()
-    self.port_input.setPlaceholderText("Port")
-    self.main_layout.addWidget(self.port_input)
-
-    # Кнопка "Создать"
-    self.create_db_button = QPushButton("Создать")
-    self.create_db_button.clicked.connect(self.create_database)
-    self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignCenter)
-
-  # Выбор пути для сохранения файла
-  @asyncSlot()
-  async def select_path(self):
-    """
-    Открывает проводник для выбора пути.
-    """
-    path = QFileDialog.getExistingDirectory(self, "Выберите путь")
-    if path:
-      self.path_input.setText(path)
-
-  # Создание клиента
-  @asyncSlot()
-  async def create_database(self):
-    """
-    Создает SQLite таблицу, если IP корректен.
-    """
-    ip = self.ip_input.text().strip()
-    if not self.validate_ip(ip):
-      QMessageBox.warning(self, "Ошибка", "Некорректный IP")
-      return
-
-    # Получаем путь и имя базы данных
-    path = self.path_input.text().strip()
-    if not path:
-      QMessageBox.warning(self, "Ошибка", "Выберите путь для создания файла")
-      return
-
-
-    # Показываем сообщение о начале загрузки
-    QMessageBox.information(self, "Информация", "Загрузка .exe client начнётся после нажатия ОК, не закрывайте окно")
-    
-    '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
-    #todo Запуск Терминала
-    await self.run_MainWindow()
-
-
-  #TODO: Функция Смены окон и открытия основного
-  @asyncSlot()
-  async def run_MainWindow(self):
-    # Скрываем нынешнее окно
-    self.hide()
-    # Создаём и отображаем новое окно
-    self.main_window = MainWindow()
-    self.main_window.show()
-
-
-  @asyncSlot()
-  async def connect_to_db(self):
-    """
-    Проверяет наличие данных в БД и разрешает подключение, если данные есть.
-    """
-    # Подключение к базе данных SQLite
-    try:
-      conn = sqlite3.connect("sqlite.db")
-      cursor = conn.cursor()
-      # Проверка наличия данных в таблице (предположим, что таблица называется 'users')
-      cursor.execute("SELECT COUNT(*) FROM connection_table")
-      result = cursor.fetchone()
-      if result and result[0] > 0:
-        # Если данные есть, разрешаем подключение
-        QMessageBox.information(self, "Успех", "Подключение успешно!")
-        self.clear_interface()
-        self.new_label = QLabel("Подключение успешно! Данные найдены.")
-        self.new_label.setAlignment(Qt.AlignCenter)
-        self.main_layout.addWidget(self.new_label)
-      else:
-        # Если данных нет, выводим сообщение
-        QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
-    except sqlite3.Error as e:
-      QMessageBox.critical(self, "Ошибка", f"Ошибка при подключении к базе данных: {e}")
-    finally:
-      if conn:
-        conn.close()
-
-  def clear_interface(self):
-    """
-    Очищает текущий интерфейс, удаляя все виджеты.
-    """
-    for i in reversed(range(self.main_layout.count())):
-      widget = self.main_layout.itemAt(i).widget()
-      if widget:
-        widget.setParent(None)
-
-
-
-
-
-
-#! Терминал внутри ОКНА С ТЕРМИНАЛОМ
-class Terminal(QTextEdit):
-  def __init__(self):
-    super().__init__()
-    self.setFont(QFont("Courier", 10))
-    self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-    self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    self.setLineWrapMode(QTextEdit.NoWrap)
-    self.setReadOnly(False)
-    self.setText("> ")
-    self.cursor = self.textCursor()
-    self.cursor.movePosition(QTextCursor.End)
-    self.setTextCursor(self.cursor)
-
-  def keyPressEvent(self, event):
-    if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
-      self.process_command()
-    else:
-      super().keyPressEvent(event)
-
-  @asyncSlot()
-  async def process_command(self):
-    cursor = self.textCursor()
-    cursor.movePosition(QTextCursor.End)
-    cursor.select(QTextCursor.LineUnderCursor)
-    command = cursor.selectedText()[2:]  # Убираем "> " из команды
-    cursor.movePosition(QTextCursor.End)
-    cursor.insertText("\n")
-
-    if command == "/help":
-      self.append("Available commands:\n/help - Show this help message")
-    else:
-      # Пример асинхронной операции
-      await asyncio.sleep(1)  # Имитация долгой операции
-      self.append(f"Unknown command: {command}")
-
-    self.append("> ")
-    cursor.movePosition(QTextCursor.End)
-    self.setTextCursor(cursor)
-
-
-
-
-
-
-
-#! ОКНО С АДМИН ТЕРМИНАЛОМ
-class TerminalWindow(QWidget):
-  def __init__(self):
-    super().__init__()
-    self.initUI()
-
-  def initUI(self):
-    self.setWindowIcon(QIcon("img/imgReadme/kraken.jpg"))
-    self.setWindowTitle("KRAKEN - ADMIN TERMINAL")
-    self.setGeometry(100, 100, 800, 600)
-
-    # Устанавливаем стили для всего окна и его элементов
-    self.setStyleSheet("""
-      QWidget {
-        background-color: #2E3440;  /* Темно-серый фон */
-        color: #ECEFF4;  /* Белый текст */
-      }
-      QTextEdit {
-        background-color: #3B4252;  /* Более светлый фон для текстового поля */
-        color: #ECEFF4;  /* Белый текст */
-        border: 1px solid #4C566A;  /* Граница */
-        padding: 5px;
-      }
-      QScrollBar:vertical {
-        background-color: #3B4252;  /* Фон скроллбара */
-        width: 12px;
-        margin: 0px;
-      }
-      QScrollBar::handle:vertical {
-        background-color: #4C566A;  /* Цвет ползунка */
-        min-height: 20px;
-        border-radius: 6px;
-      }
-      QScrollBar::add-line:vertical,
-      QScrollBar::sub-line:vertical {
-        background: none;
-      }
-      QScrollBar::add-page:vertical,
-      QScrollBar::sub-page:vertical {
-        background: none;
-      }
-    """)
-
-    layout = QVBoxLayout()
-    self.terminal = Terminal()
-    layout.addWidget(self.terminal)
-    self.setLayout(layout)
-
-
-#! Лицензионное соглашение
-class LicenseAgreementDialog(QDialog):
-  def __init__(self):
-    super().__init__()
-    self.initUI()
-
-  def initUI(self):
-    self.setWindowTitle('Лицензионное соглашение')
-    self.setGeometry(100, 100, 600, 400)
-
-    layout = QVBoxLayout()
-
-    self.text_edit = QTextEdit(self)
-    # Тест нашего соглашения
-    self.text_edit.setPlainText(license_agreement)
-    # Можно только читать
-    self.text_edit.setReadOnly(True)
-    layout.addWidget(self.text_edit)
-
-    self.checkbox = QCheckBox("Я соглашаюсь с условиями лицензионного соглашения", self)
-    self.checkbox.stateChanged.connect(self.on_checkbox_changed)
-    layout.addWidget(self.checkbox)
-
-    self.next_button = QPushButton("Далее", self)
-    self.next_button.setEnabled(False)
-    self.next_button.clicked.connect(self.accept)  # Закрываем диалог с результатом Accepted
-    layout.addWidget(self.next_button)
-
-    self.setLayout(layout)
-
-  def on_checkbox_changed(self, state):
-    if state == 2:  # 2 означает, что галочка поставлена
-      self.next_button.setEnabled(True)
-    else:
-      self.next_button.setEnabled(False)
-
-
-
 #! ЗАПУСК ПРОГРАММЫ
 if __name__ == "__main__":
   # Очистка логов (удаление файла)
@@ -959,33 +613,17 @@ if __name__ == "__main__":
     with open("kraken.log", 'w') as file:
       pass
 
-  cmd_quest = input("main or start\n> ")
-
   app = QApplication(sys.argv)
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  #! Команды для разработчиков(быстрая отладка)
-  # Запуск основного окна
-  if cmd_quest == "main":
-    #* Проверка что в окне с лицензии, пользователь подтвердил соглашение
-    if LicenseAgreementDialog().exec_() == QDialog.Accepted:
-      # Запуск окна
-      main_window = MainWindow()
-      main_window.show()
+  #* Проверка что в окне с лицензии, пользователь подтвердил соглашение
+  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+    # Запуск окна
+    main_window = MainWindow()
+    main_window.show()
 
-      with loop:
-        loop.run_forever()
-    else:
-      sys.exit()  # Завершаем программу, если лицензия не принята
-
-  # Запуск начального окна
-  elif cmd_quest == "start":
-    if LicenseAgreementDialog().exec_() == QDialog.Accepted:
-      start_window = StartWindow()
-      start_window.show()
-
-      with loop:
-        loop.run_forever()
-    else:
-      sys.exit()  # Завершаем программу, если лицензия не принята
+    with loop:
+      loop.run_forever()
+  else:
+    sys.exit()  # Завершаем программу, если лицензия не принята
