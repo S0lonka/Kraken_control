@@ -1,11 +1,15 @@
-![Картинка кракен](resources/img/imgReadme/kraken_background.jpg)
+# Guide
+1. Запускаем файл build.py (Для сборки нужного файла)
+2. запускаем app/main.py -> main - основной интерфейс / Enter - запуситить со стратового интерфеса
 
----
 
-**Функционал терминала _(без подключения main программы)_**
-![Функционал терминала](resources/img/imgReadme/terminal1.png)
 
----
-
-**Функционал BD _(Возможен ввод прямо в меню)_**
-![Функционал BD](resources/img/imgReadme/db1.png)
+## Main terminal
+**Команды:**
+- <u>/help</u> - Список команд
+- <u>/con_info</u> - Состояние подключения
+- <u>/connect</u> - Запуск сервера
+- <u>/disconnect</u> - Отключение сервера
+- <u>/terminal -A</u> - Запуск админ терминала
+- <u>/colorface</u> - Интерфейс настройки цвета
+- <u>/bible</u> - ?

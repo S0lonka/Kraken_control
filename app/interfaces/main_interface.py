@@ -236,6 +236,7 @@ class MainWindow(QMainWindow):
       /disconnect                Отключиться от клиента
       /terminal -A               Вызов админ панели
       /colorface                 Настройка цвета окна
+      /bible                     ?
       ''')
 
     # Узнать состояние подключения
