@@ -12,11 +12,19 @@ from qasync import asyncSlot, QEventLoop
 import logging
 
 
-# Импорты моих модулей
+#* Импорты моих модулей
+# Админ терминал
 from .adminTerminal_interface import TerminalWindow
+# Лицензия
 from .license_interface import LicenseAgreementDialog
+# Большие тексты
 from .utils import symbol, warning_message, bible
-from .utils.style_variables import *
+# Файл со стилями
+from .utils.style_variables import base_colors, editable_colors
+# Изменения цвета
+from .change_color_interface import ColorChangerApp
+
+
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -46,44 +54,44 @@ class MainWindow(QMainWindow):
     
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #{QWidget_bc};  /* Темно-серый фон */
-        color: #{text_color};  /* Белый текст */
+        background-color: #{base_colors["QWidget_bc"]};  /* Темно-серый фон */
+        color: #{base_colors["text_color"]};  /* Белый текст */
       }}
       QPushButton {{
-        background-color: #{button_bc};  /* Серый фон кнопок */
-        color: #{text_color};  /* Белый текст */
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        background-color: #{base_colors["button_bc"]};  /* Серый фон кнопок */
+        color: #{base_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
       }}
       QPushButton:hover {{
-        background-color: #{border_color};  /* Голубой фон при наведении */
-        color: #{button_color_hover};  /* Темный текст */
+        background-color: #{base_colors["border_color"]};  /* Голубой фон при наведении */
+        color: #{base_colors["button_color_hover"]};  /* Темный текст */
       }}
       QLineEdit, QTextEdit {{
-        background-color: #{input_area};  /* Темно-серый фон полей ввода */
-        color: #{text_color};  /* Белый текст */
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        background-color: #{base_colors["input_area"]};  /* Темно-серый фон полей ввода */
+        color: #{base_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
       }}
       QTableWidget {{
-        background-color: #{input_area};  /* Темно-серый фон таблицы */
-        color: #{text_color};  /* Белый текст */
-        gridline-color: #{border_color};  /* Голубые линии сетки */
+        background-color: #{base_colors["input_area"]};  /* Темно-серый фон таблицы */
+        color: #{base_colors["text_color"]};  /* Белый текст */
+        gridline-color: #{base_colors["border_color"]};  /* Голубые линии сетки */
       }}
       QHeaderView::section {{
-        background-color: #{button_bc};  /* Серый фон заголовков таблицы */
-        color: #{text_color};  /* Белый текст */
+        background-color: #{base_colors["button_bc"]};  /* Серый фон заголовков таблицы */
+        color: #{base_colors["text_color"]};  /* Белый текст */
         padding: 5px;
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
       }}
       QScrollArea {{
-        background-color: #{button_color_hover};  /* Темно-серый фон */
+        background-color: #{base_colors["button_color_hover"]};  /* Темно-серый фон */
         border: none;
       }}
       QLabel {{
-        color: #{text_color};  /* Белый текст */
+        color: #{base_colors["text_color"]};  /* Белый текст */
       }}
     """)
 
@@ -138,7 +146,6 @@ class MainWindow(QMainWindow):
     # Переменная для хранения состояния сервера
     self.server_running = False
     self.clientid = "1337766338621607997"
-
 
 
   #! Терминал
@@ -284,6 +291,11 @@ class MainWindow(QMainWindow):
     elif command == "/terminal -A":
       self.admin_terminal = TerminalWindow()
       self.admin_terminal.show()
+    
+    # Вызов окна изменения цвета программы
+    elif command == "/colorface":
+      self.color_interface = ColorChangerApp(parent=self)  # Передаем ссылку на родительское окно
+      self.color_interface.show()
 
 
 
@@ -567,7 +579,50 @@ class MainWindow(QMainWindow):
         return False
     return True
 
-
+  # Функция обновления стилей
+  def update_styles(self):
+    self.setStyleSheet(f"""
+      QWidget {{
+        background-color: #{editable_colors["QWidget_bc"]};  /* Темно-серый фон */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+      }}
+      QPushButton {{
+        background-color: #{editable_colors["button_bc"]};  /* Серый фон кнопок */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
+        padding: 5px;
+        border-radius: 3px;
+      }}
+      QPushButton:hover {{
+        background-color: #{editable_colors["border_color"]};  /* Голубой фон при наведении */
+        color: #{editable_colors["button_color_hover"]};  /* Темный текст */
+      }}
+      QLineEdit, QTextEdit {{
+        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон полей ввода */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
+        padding: 5px;
+        border-radius: 3px;
+      }}
+      QTableWidget {{
+        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон таблицы */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        gridline-color: #{editable_colors["border_color"]};  /* Голубые линии сетки */
+      }}
+      QHeaderView::section {{
+        background-color: #{editable_colors["button_bc"]};  /* Серый фон заголовков таблицы */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        padding: 5px;
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
+      }}
+      QScrollArea {{
+        background-color: #{editable_colors["button_color_hover"]};  /* Темно-серый фон */
+        border: none;
+      }}
+      QLabel {{
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+      }}
+    """)
 
 
 
