@@ -12,10 +12,14 @@ from qasync import asyncSlot, QEventLoop
 import logging
 
 
-# Импорты моих модулей
+#* Импорты моих модулей
+# Админ терминал
 from .adminTerminal_interface import TerminalWindow
+# Лицензия
 from .license_interface import LicenseAgreementDialog
+# Большие тексты
 from .utils import symbol, warning_message, bible
+# Файл со стилями
 from .utils.style_variables import *
 
 logging.basicConfig(
