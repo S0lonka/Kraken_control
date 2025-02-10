@@ -20,7 +20,7 @@ from .license_interface import LicenseAgreementDialog
 # Большие тексты
 from .utils import symbol, warning_message, bible
 # Файл со стилями
-from .utils.style_variables import *
+from .utils.style_variables import colors
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -50,44 +50,44 @@ class MainWindow(QMainWindow):
     
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #{QWidget_bc};  /* Темно-серый фон */
-        color: #{text_color};  /* Белый текст */
+        background-color: #{colors["QWidget_bc"]};  /* Темно-серый фон */
+        color: #{colors["text_color"]};  /* Белый текст */
       }}
       QPushButton {{
-        background-color: #{button_bc};  /* Серый фон кнопок */
-        color: #{text_color};  /* Белый текст */
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        background-color: #{colors["button_bc"]};  /* Серый фон кнопок */
+        color: #{colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
       }}
       QPushButton:hover {{
-        background-color: #{border_color};  /* Голубой фон при наведении */
-        color: #{button_color_hover};  /* Темный текст */
+        background-color: #{colors["border_color"]};  /* Голубой фон при наведении */
+        color: #{colors["button_color_hover"]};  /* Темный текст */
       }}
       QLineEdit, QTextEdit {{
-        background-color: #{input_area};  /* Темно-серый фон полей ввода */
-        color: #{text_color};  /* Белый текст */
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        background-color: #{colors["input_area"]};  /* Темно-серый фон полей ввода */
+        color: #{colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
       }}
       QTableWidget {{
-        background-color: #{input_area};  /* Темно-серый фон таблицы */
-        color: #{text_color};  /* Белый текст */
-        gridline-color: #{border_color};  /* Голубые линии сетки */
+        background-color: #{colors["input_area"]};  /* Темно-серый фон таблицы */
+        color: #{colors["text_color"]};  /* Белый текст */
+        gridline-color: #{colors["border_color"]};  /* Голубые линии сетки */
       }}
       QHeaderView::section {{
-        background-color: #{button_bc};  /* Серый фон заголовков таблицы */
-        color: #{text_color};  /* Белый текст */
+        background-color: #{colors["button_bc"]};  /* Серый фон заголовков таблицы */
+        color: #{colors["text_color"]};  /* Белый текст */
         padding: 5px;
-        border: 1px solid #{border_color};  /* Голубая рамка */
+        border: 1px solid #{colors["border_color"]};  /* Голубая рамка */
       }}
       QScrollArea {{
-        background-color: #{button_color_hover};  /* Темно-серый фон */
+        background-color: #{colors["button_color_hover"]};  /* Темно-серый фон */
         border: none;
       }}
       QLabel {{
-        color: #{text_color};  /* Белый текст */
+        color: #{colors["text_color"]};  /* Белый текст */
       }}
     """)
 
