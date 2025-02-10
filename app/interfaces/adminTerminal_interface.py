@@ -1,4 +1,3 @@
-import asyncio
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QTextCursor, QFont
@@ -37,7 +36,6 @@ class Terminal(QTextEdit):
       self.append("Available commands:\n/help - Show this help message")
     else:
       # Пример асинхронной операции
-      await asyncio.sleep(1)  # Имитация долгой операции
       self.append(f"Unknown command: {command}")
 
     self.append("> ")
@@ -59,7 +57,7 @@ class TerminalWindow(QWidget):
   def initUI(self):
     self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
     self.setWindowTitle("KRAKEN - ADMIN TERMINAL")
-    self.setGeometry(100, 100, 800, 600)
+    self.setGeometry(100, 100, 700, 500)
 
     # Устанавливаем стили для всего окна и его элементов
     self.setStyleSheet("""
