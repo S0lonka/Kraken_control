@@ -1,10 +1,5 @@
-#! Файл для стилей
+# Базовые (стандартные) стили
+base_colors = {'QWidget_bc': '2E3440', 'text_color': 'ECEFF4', 'button_bc': '4C566A', 'border_color': '81A1C1', 'button_color_hover': '2E3440', 'input_area': '3B4252'}
 
-colors = {
-  "QWidget_bc": "2E3440",  # Задний фон основного окна
-  "text_color": "ECEFF4",  # Текст
-  "button_bc": "4C566A",  # Фон для кнопок
-  "border_color": "81A1C1",  # Рамка
-  "button_color_hover": "2E3440",  # Скролл и цвет кнопки при наведении
-  "input_area": "3B4252"  # Поля ввода
-}
+# Изменяемые стили (изначально копия базовых)
+editable_colors = {'QWidget_bc': '2E3440', 'text_color': 'ECEFF4', 'button_bc': '4C566A', 'border_color': '81A1C1', 'button_color_hover': '2E3440', 'input_area': '3B4252'}

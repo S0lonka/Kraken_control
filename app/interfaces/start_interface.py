@@ -13,7 +13,7 @@ from .main_interface import MainWindow
 # Лицензия
 from .license_interface import LicenseAgreementDialog
 # Файл со стилями
-from .utils.style_variables import colors
+from .utils.style_variables import base_colors
 
 
 #! Класс Стартового окна
@@ -33,30 +33,30 @@ class StartWindow(QMainWindow):
     # Применяем стили
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #{colors["QWidget_bc"]};  /* Темно-серый фон */
-        color: #{colors["text_color"]};  /* Белый текст */
+        background-color: #{base_colors["QWidget_bc"]};  /* Темно-серый фон */
+        color: #{base_colors["text_color"]};  /* Белый текст */
       }}
       QPushButton {{
-        background-color: #{colors["button_bc"]};  /* Серый фон кнопок */
-        color: #{colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{colors["border_color"]};  /* Голубая рамка */
+        background-color: #{base_colors["button_bc"]};  /* Серый фон кнопок */
+        color: #{base_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
         padding: 10px;
         border-radius: 5px;
         font-size: 16px;
       }}
       QPushButton:hover {{
-        background-color: #{colors["border_color"]};  /* Голубой фон при наведении */
-        color: #{colors["button_color_hover"]};  /* Темный текст */
+        background-color: #{base_colors["border_color"]};  /* Голубой фон при наведении */
+        color: #{base_colors["button_color_hover"]};  /* Темный текст */
       }}
       QLabel {{
-        color: #{colors["text_color"]};  /* Белый текст */
+        color: #{base_colors["text_color"]};  /* Белый текст */
         font-size: 24px;
         font-weight: bold;
       }}
       QLineEdit {{
-        background-color: #{colors["input_area"]};  /* Темно-серый фон полей ввода */
-        color: #{colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{colors["border_color"]};  /* Голубая рамка */
+        background-color: #{base_colors["input_area"]};  /* Темно-серый фон полей ввода */
+        color: #{base_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
       }}
