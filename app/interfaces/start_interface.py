@@ -13,6 +13,7 @@ from .license_interface import LicenseAgreementDialog
 
 
 #! Класс Стартового окна
+
 class StartWindow(QMainWindow):
   def __init__(self):
     super().__init__()
