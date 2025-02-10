@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import sqlite3
 import asyncio
@@ -20,7 +21,7 @@ from .license_interface import LicenseAgreementDialog
 # Большие тексты
 from .utils import symbol, warning_message, bible
 # Файл со стилями
-from .utils.style_variables import editable_colors
+from .utils.style.style_variables_editable import editable_colors
 # Изменения цвета
 from .change_color_interface import ColorChangerApp
 

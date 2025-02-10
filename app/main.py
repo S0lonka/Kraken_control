@@ -4,11 +4,11 @@ import asyncio
 from PyQt5.QtWidgets import (QApplication,QDialog)
 from qasync import QEventLoop
 
-
 # Импорты моих модулей
 from interfaces.license_interface import LicenseAgreementDialog
 from interfaces.start_interface import StartWindow
 from interfaces.main_interface import MainWindow
+
 
 def main():
   app = QApplication(sys.argv)

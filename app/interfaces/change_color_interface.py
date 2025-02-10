@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QSlider, QLineEd
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from .utils.style_variables import base_colors, editable_colors  # Импортируем оба словаря
-
+from .utils.style.style_variables_base import base_colors  # Импортируем общий словарь
+from .utils.style.style_variables_editable import editable_colors
 
 class ColorChangerApp(QWidget):
   def __init__(self, parent=None):
@@ -168,15 +168,13 @@ class ColorChangerApp(QWidget):
 
   def save_editable_colors_to_file(self):
     # Формируем содержимое для записи в файл
-    file_content = f"""# Базовые (стандартные) стили
-base_colors = {base_colors}
-
+    file_content = f"""
 # Изменяемые стили (изначально копия базовых)
 editable_colors = {editable_colors}
 """
 
     # Записываем в файл
-    with open("app/interfaces/utils/style_variables.py", "w", encoding="utf-8") as file:
+    with open("app/interfaces/utils/style/style_variables_editable.py", "w", encoding="utf-8") as file:
       file.write(file_content)
     
     # Обновляем стили в родительском окне

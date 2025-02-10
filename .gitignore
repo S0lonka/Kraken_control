@@ -15,3 +15,5 @@ kraken.log
 # Появляется при импорте своих файлов
 __pycache__/
 main/client/client.log
+
+style_variables_editable.py

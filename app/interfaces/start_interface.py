@@ -13,7 +13,7 @@ from .main_interface import MainWindow
 # Лицензия
 from .license_interface import LicenseAgreementDialog
 # Файл со стилями
-from .utils.style_variables import base_colors
+from .utils.style.style_variables_base import base_colors
 
 
 #! Класс Стартового окна
