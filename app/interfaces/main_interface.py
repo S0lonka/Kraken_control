@@ -16,7 +16,7 @@ import logging
 from .adminTerminal_interface import TerminalWindow
 from .license_interface import LicenseAgreementDialog
 from .utils import symbol, warning_message
-
+from .utils.style_variables import *
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -76,47 +76,48 @@ class MainWindow(QMainWindow):
     self.setGeometry(200, 100, 1200, 700)
 
     # Применяем стили
-    self.setStyleSheet("""
-      QWidget {
-        background-color: #2E3440;  /* Темно-серый фон */
-        color: #ECEFF4;  /* Белый текст */
-      }
-      QPushButton {
-        background-color: #4C566A;  /* Серый фон кнопок */
-        color: #ECEFF4;  /* Белый текст */
-        border: 1px solid #81A1C1;  /* Голубая рамка */
+    
+    self.setStyleSheet(f"""
+      QWidget {{
+        background-color: #{QWidget_bc};  /* Темно-серый фон */
+        color: #{text_color};  /* Белый текст */
+      }}
+      QPushButton {{
+        background-color: #{button_bc};  /* Серый фон кнопок */
+        color: #{text_color};  /* Белый текст */
+        border: 1px solid #{border_color};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
-      }
-      QPushButton:hover {
-        background-color: #81A1C1;  /* Голубой фон при наведении */
-        color: #2E3440;  /* Темный текст */
-      }
-      QLineEdit, QTextEdit {
-        background-color: #3B4252;  /* Темно-серый фон полей ввода */
-        color: #ECEFF4;  /* Белый текст */
-        border: 1px solid #81A1C1;  /* Голубая рамка */
+      }}
+      QPushButton:hover {{
+        background-color: #{border_color};  /* Голубой фон при наведении */
+        color: #{button_color_hover};  /* Темный текст */
+      }}
+      QLineEdit, QTextEdit {{
+        background-color: #{input_area};  /* Темно-серый фон полей ввода */
+        color: #{text_color};  /* Белый текст */
+        border: 1px solid #{border_color};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
-      }
-      QTableWidget {
-        background-color: #3B4252;  /* Темно-серый фон таблицы */
-        color: #ECEFF4;  /* Белый текст */
-        gridline-color: #81A1C1;  /* Голубые линии сетки */
-      }
-      QHeaderView::section {
-        background-color: #4C566A;  /* Серый фон заголовков таблицы */
-        color: #ECEFF4;  /* Белый текст */
+      }}
+      QTableWidget {{
+        background-color: #{input_area};  /* Темно-серый фон таблицы */
+        color: #{text_color};  /* Белый текст */
+        gridline-color: #{border_color};  /* Голубые линии сетки */
+      }}
+      QHeaderView::section {{
+        background-color: #{button_bc};  /* Серый фон заголовков таблицы */
+        color: #{text_color};  /* Белый текст */
         padding: 5px;
-        border: 1px solid #81A1C1;  /* Голубая рамка */
-      }
-      QScrollArea {
-        background-color: #2E3440;  /* Темно-серый фон */
+        border: 1px solid #{border_color};  /* Голубая рамка */
+      }}
+      QScrollArea {{
+        background-color: #{button_color_hover};  /* Темно-серый фон */
         border: none;
-      }
-      QLabel {
-        color: #ECEFF4;  /* Белый текст */
-      }
+      }}
+      QLabel {{
+        color: #{text_color};  /* Белый текст */
+      }}
     """)
 
     # Создаем контейнер для кнопок и основного окна
