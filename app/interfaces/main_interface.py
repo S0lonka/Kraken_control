@@ -16,7 +16,7 @@ import logging
 from .adminTerminal_interface import TerminalWindow
 from .license_interface import LicenseAgreementDialog
 from .utils import symbol, warning_message
-
+from .utils.style_variables import *
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
     # Применяем стили
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #2E3440;  /* Темно-серый фон */
+        background-color: #{QWidget_bc};  /* Темно-серый фон */
         color: #ECEFF4;  /* Белый текст */
       }}
       QPushButton {{

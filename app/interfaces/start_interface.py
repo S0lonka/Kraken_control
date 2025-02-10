@@ -7,9 +7,13 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
 
-# Импорты моих библиотек
+#* Импорты моих библиотек
+# Основное окно
 from .main_interface import MainWindow
+# Лицензия
 from .license_interface import LicenseAgreementDialog
+# Файл со стилями
+from .utils.style_variables import *
 
 
 #! Класс Стартового окна
@@ -28,7 +32,7 @@ class StartWindow(QMainWindow):
     # Применяем стили
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #2E3440;  /* Темно-серый фон */
+        background-color: #{QWidget_bc};  /* Темно-серый фон */
         color: #ECEFF4;  /* Белый текст */
       }}
       QPushButton {{
