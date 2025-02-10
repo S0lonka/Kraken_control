@@ -26,35 +26,35 @@ class StartWindow(QMainWindow):
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
 
     # Применяем стили
-    self.setStyleSheet("""
-      QWidget {
+    self.setStyleSheet(f"""
+      QWidget {{
         background-color: #2E3440;  /* Темно-серый фон */
         color: #ECEFF4;  /* Белый текст */
-      }
-      QPushButton {
+      }}
+      QPushButton {{
         background-color: #4C566A;  /* Серый фон кнопок */
         color: #ECEFF4;  /* Белый текст */
         border: 1px solid #81A1C1;  /* Голубая рамка */
         padding: 10px;
         border-radius: 5px;
         font-size: 16px;
-      }
-      QPushButton:hover {
+      }}
+      QPushButton:hover {{
         background-color: #81A1C1;  /* Голубой фон при наведении */
         color: #2E3440;  /* Темный текст */
-      }
-      QLabel {
+      }}
+      QLabel {{
         color: #ECEFF4;  /* Белый текст */
         font-size: 24px;
         font-weight: bold;
-      }
-      QLineEdit {
+      }}
+      QLineEdit {{
         background-color: #3B4252;  /* Темно-серый фон полей ввода */
         color: #ECEFF4;  /* Белый текст */
         border: 1px solid #81A1C1;  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
-      }
+      }}
     """)
     # Инициализация начального интерфейса
     self.init_ui()
