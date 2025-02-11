@@ -152,6 +152,9 @@ class MainWindow(QMainWindow):
     self.server_running = False
     self.clientid = "1337766338621607997"
 
+    # Устанавливаем что кейлоггер не активен(чтобы незагружать систему)
+    self.keylogger_active = False
+
 
   #! Терминал
   @asyncSlot()
@@ -351,6 +354,9 @@ class MainWindow(QMainWindow):
     """
     logging.info("Отображение интерфейса для Key Logger")
     self.clear_content()
+    
+    # Устанавливаем флаг, что Key Logger активен
+    self.keylogger_active = True
 
     # Создаем текстовое поле
     self.text_edit = QTextEdit(self)
@@ -367,11 +373,12 @@ class MainWindow(QMainWindow):
     self.clear_button = QPushButton('Очистить', self)
     self.clear_button.clicked.connect(self.clear_text)
     self.content_layout.addWidget(self.clear_button)
-
-    # Инициализация таймера для обновления текстового поля
-    self.timer = QTimer()
-    self.timer.timeout.connect(self.update_text)
-    self.timer.start(3000)  # Обновление каждые 3 секунды
+    
+    if self.keylogger_active:
+      # Инициализация таймера для обновления текстового поля
+      self.timer = QTimer()
+      self.timer.timeout.connect(self.update_text)
+      self.timer.start(3000)  # Обновление каждые 3 секунды
 
   def load_keylog_text(self):
     """
@@ -392,9 +399,11 @@ class MainWindow(QMainWindow):
     """
     Обновляет текст в текстовом поле.
     """
-    # Перезагружаем текст из файла
-    updated_text = self.load_keylog_text()
-    self.text_edit.setText(updated_text)
+    # Перезагружаем текст из файла если key logger активен
+    if self.keylogger_active:
+      updated_text = self.load_keylog_text()
+      self.text_edit.setText(updated_text)
+      logging.info("Текст Key Logger обновлен")
 
   def clear_text(self):
     """
@@ -616,6 +625,9 @@ class MainWindow(QMainWindow):
     """
     for i in reversed(range(self.content_layout.count())):
       self.content_layout.itemAt(i).widget().setParent(None)
+
+    # Устанавливаем что кейлоггер не активен(чтобы незагружать систему)
+    self.keylogger_active = False
 
 
   def validate_ip(self, ip):

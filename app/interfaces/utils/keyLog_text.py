@@ -1,3 +1,3 @@
 
 # Сохраняем текст который принимает кей логгер
-keyLog_text = "fffffff"
+keyLog_text = "Hello World"
