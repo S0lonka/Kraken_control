@@ -6,7 +6,7 @@ import asyncio
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit, QMessageBox, QDialog)
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon
 from qasync import asyncSlot, QEventLoop
 # import discordrp
@@ -337,6 +337,7 @@ class MainWindow(QMainWindow):
     logging.debug("Добавление метки в макет")
     self.content_layout.addWidget(self.video_label)
 
+
   #! Key Logger
   @asyncSlot()
   async def show_keylogger(self):
@@ -350,8 +351,39 @@ class MainWindow(QMainWindow):
     self.text_display = QTextEdit()
     self.text_display.setReadOnly(True)
 
-    logging.debug("Добавление текстового поля в макет")
+    logging.debug("Создание кнопки 'Очистить'")
+    self.clear_button = QPushButton("Очистить")
+    self.clear_button.clicked.connect(self.clear_text_display)
+
+    logging.debug("Добавление текстового поля и кнопки в макет")
     self.content_layout.addWidget(self.text_display)
+    self.content_layout.addWidget(self.clear_button)
+
+    # Инициализация таймера для обновления текстового поля
+    self.timer = QTimer()
+    self.timer.timeout.connect(self.update_text_display)
+    self.timer.start(3000)  # Обновление каждые 3 секунды
+
+  def clear_text_display(self):
+    """
+    Очищает текстовое поле.
+    """
+    self.text_display.clear()
+
+  def update_text_display(self):
+    """
+    Обновляет текстовое поле новыми данными.
+    """
+    # Здесь вы можете обновить текстовое поле с новыми данными
+    new_data = self.get_updated_data()  # Предположим, что у вас есть метод для получения обновленных данных
+    self.text_display.setPlainText(new_data)
+
+  def get_updated_data(self):
+    """
+    Возвращает обновленные данные для отображения в текстовом поле.
+    """
+    # Здесь должен быть ваш код для получения обновленных данных
+    return "Обновленные данные"
 
   #! Информация
   @asyncSlot()

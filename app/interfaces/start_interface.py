@@ -3,7 +3,7 @@ import sqlite3
 import asyncio
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
                             QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog,
-                            QMainWindow, QTableWidget, QTableWidgetItem)
+                            QMainWindow, QTableWidget, QTableWidgetItem, QTextEdit)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
@@ -120,7 +120,7 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.create_button)
     self.main_layout.addWidget(self.connect_button)
 
-  #* Создаём клиент(ввод данных)
+
   @asyncSlot()
   async def create_interface(self):
     """
@@ -128,6 +128,11 @@ class StartWindow(QMainWindow):
     """
     self.clear_interface()
     
+    # Кнопка "Назад" в верхнем левом углу
+    self.back_button = QPushButton("Назад")
+    self.back_button.clicked.connect(self.change_interface)
+    self.main_layout.addWidget(self.back_button, alignment=Qt.AlignLeft | Qt.AlignTop)
+
     # Поле для выбора пути
     self.path_layout = QHBoxLayout()
     self.path_input = QLineEdit()
@@ -227,20 +232,41 @@ class StartWindow(QMainWindow):
         # Если данных нет, выводим сообщение
         QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
     except sqlite3.Error as e:
-      QMessageBox.critical(self, "Ошибка", f"Ошибка при подключении к базе данных: {e}")
+      QMessageBox.critical(self, "Ошибка", f"Ошибка при подключении к базе данных: {e}, Возможно БД ещё несоздана")
     finally:
       if conn:
         conn.close()
 
-  # Очистка интерфейса
   def clear_interface(self):
     """
-    Очищает текущий интерфейс, удаляя все виджеты.
+    Очищает текущий интерфейс, удаляя все виджеты и макеты.
     """
-    for i in reversed(range(self.main_layout.count())):
-      widget = self.main_layout.itemAt(i).widget()
-      if widget:
+    # Удаляем все виджеты и макеты из main_layout
+    while self.main_layout.count():
+      item = self.main_layout.takeAt(0)  # Берем первый элемент макета
+      if item.widget():
+        # Если элемент — виджет, удаляем его
+        widget = item.widget()
         widget.setParent(None)
+        widget.deleteLater()  # Освобождаем память
+      elif item.layout():
+        # Если элемент — макет, рекурсивно удаляем его содержимое
+        self._clear_layout(item.layout())
+
+  def _clear_layout(self, layout):
+    """
+    Рекурсивно очищает макет и удаляет все его виджеты и вложенные макеты.
+    """
+    while layout.count():
+      item = layout.takeAt(0)
+      if item.widget():
+        # Удаляем виджет
+        widget = item.widget()
+        widget.setParent(None)
+        widget.deleteLater()
+      elif item.layout():
+        # Рекурсивно очищаем вложенный макет
+        self._clear_layout(item.layout())
 
 
   # Проверка что ip введён правильно
