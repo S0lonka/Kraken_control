@@ -24,6 +24,8 @@ from .utils import symbol, warning_message, bible
 from .utils.style.style_variables_editable import editable_colors
 # Изменения цвета
 from .change_color_interface import ColorChangerApp
+# Текст Кей логгера
+from .utils.keyLog_text import keyLog_text
 
 
 
@@ -366,24 +368,24 @@ class MainWindow(QMainWindow):
 
   def clear_text_display(self):
     """
-    Очищает текстовое поле.
+    Очищает текстовый файл.
     """
-    self.text_display.clear()
+    with open("app/interfaces/utils/keyLog_text.py", "w", encoding="utf-8") as file:
+      file.write("""# Сохраняем текст который принимает кей логгер
+keyLog_text = ""
+""")
+    # Обновляем текстовое поле
+    self.update_text_display()
 
   def update_text_display(self):
     """
-    Обновляет текстовое поле новыми данными.
+    Обновляет текстовое поле значением переменной keyLog_text.
     """
-    # Здесь вы можете обновить текстовое поле с новыми данными
-    new_data = self.get_updated_data()  # Предположим, что у вас есть метод для получения обновленных данных
-    self.text_display.setPlainText(new_data)
-
-  def get_updated_data(self):
-    """
-    Возвращает обновленные данные для отображения в текстовом поле.
-    """
-    # Здесь должен быть ваш код для получения обновленных данных
-    return "Обновленные данные"
+    # Импортируем переменную keyLog_text из файла
+    from .utils.keyLog_text import keyLog_text
+    
+    # Устанавливаем текст в QTextEdit
+    self.text_display.setPlainText(keyLog_text)
 
   #! Информация
   @asyncSlot()
