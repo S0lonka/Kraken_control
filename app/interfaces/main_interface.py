@@ -19,7 +19,7 @@ from .adminTerminal_interface import TerminalWindow
 # Лицензия
 from .license_interface import LicenseAgreementDialog
 # Большие тексты
-from .utils import symbol, warning_message, bible
+from .utils import symbol, warning_message, bible, template_keyLog_text
 # Файл со стилями
 from .utils.style.style_variables_editable import editable_colors
 # Изменения цвета
@@ -37,10 +37,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-template_keyLog_text = '''
-# Сохраняем текст который принимает кей логгер
-keyLog_text = ""
-'''
+
 
 #! Класс Основного окна
 class MainWindow(QMainWindow):
@@ -373,13 +370,14 @@ class MainWindow(QMainWindow):
     self.clear_button = QPushButton('Очистить', self)
     self.clear_button.clicked.connect(self.clear_text)
     self.content_layout.addWidget(self.clear_button)
-    
+
     if self.keylogger_active:
       # Инициализация таймера для обновления текстового поля
       self.timer = QTimer()
       self.timer.timeout.connect(self.update_text)
       self.timer.start(3000)  # Обновление каждые 3 секунды
 
+  # Загрузка текста из файла
   def load_keylog_text(self):
     """
     Загружает текст из файла keyLog_text.py.
