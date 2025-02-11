@@ -37,7 +37,10 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-
+template_keyLog_text = '''
+# Сохраняем текст который принимает кей логгер
+keyLog_text = ""
+'''
 
 #! Класс Основного окна
 class MainWindow(QMainWindow):
@@ -344,48 +347,58 @@ class MainWindow(QMainWindow):
   @asyncSlot()
   async def show_keylogger(self):
     """
-    Отображает интерфейс для key logger-а.
+    Отображает интерфейс для Key Logger.
     """
-    logging.info("Отображение интерфейса для key logger-а")
+    logging.info("Отображение интерфейса для Key Logger")
     self.clear_content()
 
-    logging.debug("Создание текстового поля для вывода данных key logger-а")
-    self.text_display = QTextEdit()
-    self.text_display.setReadOnly(True)
+    # Создаем текстовое поле
+    self.text_edit = QTextEdit(self)
+    self.text_edit.setReadOnly(True)  # Делаем поле только для чтения
+    self.text_edit.setText(self.load_keylog_text())  # Устанавливаем текст из переменной
+    self.content_layout.addWidget(self.text_edit)
 
-    logging.debug("Создание кнопки 'Очистить'")
-    self.clear_button = QPushButton("Очистить")
-    self.clear_button.clicked.connect(self.clear_text_display)
+    # Создаем кнопку "Обновить"
+    self.update_button = QPushButton('Обновить', self)
+    self.update_button.clicked.connect(self.update_text)
+    self.content_layout.addWidget(self.update_button)
 
-    logging.debug("Добавление текстового поля и кнопки в макет")
-    self.content_layout.addWidget(self.text_display)
+    # Создаем кнопку "Очистить"
+    self.clear_button = QPushButton('Очистить', self)
+    self.clear_button.clicked.connect(self.clear_text)
     self.content_layout.addWidget(self.clear_button)
 
-    # Инициализация таймера для обновления текстового поля
-    self.timer = QTimer()
-    self.timer.timeout.connect(self.update_text_display)
-    self.timer.start(3000)  # Обновление каждые 3 секунды
-
-  def clear_text_display(self):
+  def load_keylog_text(self):
     """
-    Очищает текстовый файл.
+    Загружает текст из файла keyLog_text.py.
+    """
+    try:
+      with open("app/interfaces/utils/keyLog_text.py", "r", encoding="utf-8") as file:
+        # Ищем строку с keyLog_text и извлекаем её значение
+        for line in file:
+          if line.startswith("keyLog_text ="):
+            return line.split("=", 1)[1].strip().strip('"')
+    except Exception as e:
+      logging.error(f"Ошибка при загрузке keyLog_text: {e}")
+    return ""
+
+  def update_text(self):
+    """
+    Обновляет текст в текстовом поле.
+    """
+    # Перезагружаем текст из файла
+    updated_text = self.load_keylog_text()
+    self.text_edit.setText(updated_text)
+
+  def clear_text(self):
+    """
+    Очищает текст в переменной и в текстовом поле.
     """
     with open("app/interfaces/utils/keyLog_text.py", "w", encoding="utf-8") as file:
-      file.write("""# Сохраняем текст который принимает кей логгер
-keyLog_text = ""
-""")
-    # Обновляем текстовое поле
-    self.update_text_display()
+      file.write(template_keyLog_text)
+    self.text_edit.setText("")  # Очищаем текстовое поле
 
-  def update_text_display(self):
-    """
-    Обновляет текстовое поле значением переменной keyLog_text.
-    """
-    # Импортируем переменную keyLog_text из файла
-    from .utils.keyLog_text import keyLog_text
-    
-    # Устанавливаем текст в QTextEdit
-    self.text_display.setPlainText(keyLog_text)
+
 
   #! Информация
   @asyncSlot()
