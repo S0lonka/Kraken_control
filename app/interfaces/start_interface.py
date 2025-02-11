@@ -2,7 +2,8 @@ import sys
 import sqlite3
 import asyncio
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
-                             QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog, QMainWindow)
+                            QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog,
+                            QMainWindow, QTableWidget, QTableWidgetItem)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
@@ -13,7 +14,7 @@ from .main_interface import MainWindow
 # Лицензия
 from .license_interface import LicenseAgreementDialog
 # Файл со стилями
-from .utils.style.style_variables_base import base_colors
+from .utils.style.style_variables_editable import editable_colors
 
 
 #! Класс Стартового окна
@@ -33,32 +34,44 @@ class StartWindow(QMainWindow):
     # Применяем стили
     self.setStyleSheet(f"""
       QWidget {{
-        background-color: #{base_colors["QWidget_bc"]};  /* Темно-серый фон */
-        color: #{base_colors["text_color"]};  /* Белый текст */
+        background-color: #{editable_colors["QWidget_bc"]};  /* Темно-серый фон */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
       QPushButton {{
-        background-color: #{base_colors["button_bc"]};  /* Серый фон кнопок */
-        color: #{base_colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
-        padding: 10px;
-        border-radius: 5px;
-        font-size: 16px;
-      }}
-      QPushButton:hover {{
-        background-color: #{base_colors["border_color"]};  /* Голубой фон при наведении */
-        color: #{base_colors["button_color_hover"]};  /* Темный текст */
-      }}
-      QLabel {{
-        color: #{base_colors["text_color"]};  /* Белый текст */
-        font-size: 24px;
-        font-weight: bold;
-      }}
-      QLineEdit {{
-        background-color: #{base_colors["input_area"]};  /* Темно-серый фон полей ввода */
-        color: #{base_colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{base_colors["border_color"]};  /* Голубая рамка */
+        background-color: #{editable_colors["button_bc"]};  /* Серый фон кнопок */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
         padding: 5px;
         border-radius: 3px;
+      }}
+      QPushButton:hover {{
+        background-color: #{editable_colors["border_color"]};  /* Голубой фон при наведении */
+        color: #{editable_colors["button_color_hover"]};  /* Темный текст */
+      }}
+      QLineEdit, QTextEdit {{
+        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон полей ввода */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
+        padding: 5px;
+        border-radius: 3px;
+      }}
+      QTableWidget {{
+        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон таблицы */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        gridline-color: #{editable_colors["border_color"]};  /* Голубые линии сетки */
+      }}
+      QHeaderView::section {{
+        background-color: #{editable_colors["button_bc"]};  /* Серый фон заголовков таблицы */
+        color: #{editable_colors["text_color"]};  /* Белый текст */
+        padding: 5px;
+        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
+      }}
+      QScrollArea {{
+        background-color: #{editable_colors["button_color_hover"]};  /* Темно-серый фон */
+        border: none;
+      }}
+      QLabel {{
+        color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
     """)
     # Инициализация начального интерфейса
@@ -179,35 +192,37 @@ class StartWindow(QMainWindow):
     await self.run_MainWindow()
 
 
-  #TODO: Функция Смены окон и открытия основного
-  @asyncSlot()
-  async def run_MainWindow(self):
-    # Скрываем нынешнее окно
-    self.hide()
-    # Создаём и отображаем новое окно
-    self.main_window = MainWindow()
-    self.main_window.show()
-
 
   @asyncSlot()
   async def connect_to_db(self):
     """
-    Проверяет наличие данных в БД и разрешает подключение, если данные есть.
+    Проверяет наличие данных в БД и отображает их в таблице, если данные есть.
     """
-    # Подключение к базе данных SQLite
     try:
       conn = sqlite3.connect("sqlite.db")
       cursor = conn.cursor()
-      # Проверка наличия данных в таблице (предположим, что таблица называется 'users')
-      cursor.execute("SELECT COUNT(*) FROM connection_table")
-      result = cursor.fetchone()
-      if result and result[0] > 0:
-        # Если данные есть, разрешаем подключение
-        QMessageBox.information(self, "Успех", "Подключение успешно!")
+      # Проверка наличия данных в таблице (предположим, что таблица называется 'connection_table')
+      cursor.execute("SELECT name, ip, port FROM connection_table")
+      result = cursor.fetchall()
+
+      if result:
+        # Если данные есть, отображаем их в таблице
         self.clear_interface()
-        self.new_label = QLabel("Подключение успешно! Данные найдены.")
-        self.new_label.setAlignment(Qt.AlignCenter)
-        self.main_layout.addWidget(self.new_label)
+        self.main_layout.addWidget(QLabel("Ваши поклонники", alignment=Qt.AlignCenter))
+
+        # Создаем таблицу
+        self.table = QTableWidget(len(result), 3)
+        self.table.setHorizontalHeaderLabels(["Имя", "IP", "Port"])
+        for row_idx, row_data in enumerate(result):
+          for col_idx, col_data in enumerate(row_data):
+            self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
+
+        self.main_layout.addWidget(self.table)
+
+        # Добавляем кнопку "Продолжить"
+        self.continue_button = QPushButton("Продолжить")
+        self.continue_button.clicked.connect(self.run_MainWindow)
+        self.main_layout.addWidget(self.continue_button, alignment=Qt.AlignCenter)
       else:
         # Если данных нет, выводим сообщение
         QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
@@ -244,6 +259,15 @@ class StartWindow(QMainWindow):
       except ValueError:
         return False
     return True
+
+  #TODO: Функция Смены окон и открытия основного
+  @asyncSlot()
+  async def run_MainWindow(self):
+    # Скрываем нынешнее окно
+    self.hide()
+    # Создаём и отображаем новое окно
+    self.main_window = MainWindow()
+    self.main_window.show()
 
 
 
