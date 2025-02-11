@@ -368,6 +368,11 @@ class MainWindow(QMainWindow):
     self.clear_button.clicked.connect(self.clear_text)
     self.content_layout.addWidget(self.clear_button)
 
+    # Инициализация таймера для обновления текстового поля
+    self.timer = QTimer()
+    self.timer.timeout.connect(self.update_text)
+    self.timer.start(3000)  # Обновление каждые 3 секунды
+
   def load_keylog_text(self):
     """
     Загружает текст из файла keyLog_text.py.
@@ -382,7 +387,8 @@ class MainWindow(QMainWindow):
       logging.error(f"Ошибка при загрузке keyLog_text: {e}")
     return ""
 
-  def update_text(self):
+  @asyncSlot()
+  async def update_text(self):
     """
     Обновляет текст в текстовом поле.
     """
