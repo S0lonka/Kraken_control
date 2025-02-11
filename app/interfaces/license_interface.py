@@ -27,7 +27,7 @@ class LicenseAgreementDialog(QDialog):
 
     self.text_edit = QTextEdit(self)
     # Тест нашего соглашения
-    self.text_edit.setPlainText(license_agreement)
+    self.text_edit.setHtml(license_agreement)
     # Можно только читать
     self.text_edit.setReadOnly(True)
     self.text_edit.setMaximumHeight(200)  # Уменьшаем высоту окна с соглашением

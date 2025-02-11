@@ -189,7 +189,7 @@ class StartWindow(QMainWindow):
     
     '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
     #todo Запуск Терминала
-    await self.run_MainWindow()
+    asyncio.create_task(self.run_MainWindow())
 
 
 
