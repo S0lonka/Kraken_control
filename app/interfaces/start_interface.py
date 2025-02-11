@@ -197,7 +197,6 @@ class StartWindow(QMainWindow):
     asyncio.create_task(self.run_MainWindow())
 
 
-
   @asyncSlot()
   async def connect_to_db(self):
     """
@@ -213,6 +212,21 @@ class StartWindow(QMainWindow):
       if result:
         # Если данные есть, отображаем их в таблице
         self.clear_interface()
+
+        # Создаем верхний макет для кнопки "Назад"
+        self.top_layout = QHBoxLayout()
+        self.top_layout.setContentsMargins(0, 0, 0, 0)  # Убираем отступы
+        self.top_layout.setSpacing(0)  # Убираем промежутки между элементами
+
+        # Кнопка "Назад" в верхнем левом углу
+        self.back_button = QPushButton("Назад")
+        self.back_button.clicked.connect(self.change_interface)
+        self.top_layout.addWidget(self.back_button, alignment=Qt.AlignLeft | Qt.AlignTop)
+
+        # Добавляем верхний макет в основной макет
+        self.main_layout.addLayout(self.top_layout)
+
+        # Заголовок
         self.main_layout.addWidget(QLabel("Ваши поклонники", alignment=Qt.AlignCenter))
 
         # Создаем таблицу
@@ -237,6 +251,7 @@ class StartWindow(QMainWindow):
       if conn:
         conn.close()
 
+  # Очистка интерфейса
   def clear_interface(self):
     """
     Очищает текущий интерфейс, удаляя все виджеты и макеты.
@@ -253,6 +268,7 @@ class StartWindow(QMainWindow):
         # Если элемент — макет, рекурсивно удаляем его содержимое
         self._clear_layout(item.layout())
 
+  # Очистка layout для функции очистки интерфейсов
   def _clear_layout(self, layout):
     """
     Рекурсивно очищает макет и удаляет все его виджеты и вложенные макеты.
