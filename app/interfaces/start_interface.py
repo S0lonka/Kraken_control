@@ -227,7 +227,7 @@ class StartWindow(QMainWindow):
     port = self.port_input.text()
 
     # Подключаемся к базе данных (файл sqlite.db)
-    conn = sqlite3.connect('sqlite.db')
+    conn = sqlite3.connect('app/sqlite.db')
     cursor = conn.cursor()
 
     try:
@@ -267,7 +267,7 @@ class StartWindow(QMainWindow):
     Проверяет наличие данных в БД и отображает их в таблице, если данные есть.
     """
     try:
-      conn = sqlite3.connect("sqlite.db")
+      conn = sqlite3.connect("app/sqlite.db")
       cursor = conn.cursor()
       # Проверка наличия данных в таблице (предположим, что таблица называется 'connection_table')
       cursor.execute("SELECT name, ip, port FROM connection_table")

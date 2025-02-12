@@ -15,7 +15,7 @@ class ColorChangerApp(QWidget):
   def initUI(self):
     self.setWindowTitle('KRAKEN - Color Changer')
     self.setGeometry(100, 100, 400, 600)
-    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
+    self.setWindowIcon(QIcon("app/interfaces/utils/resource/kraken.jpg"))
 
     self.setStyleSheet(f"""
       QWidget {{

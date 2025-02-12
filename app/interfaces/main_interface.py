@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
+    self.setWindowIcon(QIcon("app/interfaces/utils/resource/kraken.jpg"))
 
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
     self.show_terminal()
 
     # Подключение к базе данных SQLite
-    self.db_connection = sqlite3.connect("sqlite.db")  # Укажите путь к вашей базе данных
+    self.db_connection = sqlite3.connect("app/sqlite.db")  # Укажите путь к вашей базе данных
     self.cursor = self.db_connection.cursor()
 
     # Создаем тестовую таблицу, если её нет
