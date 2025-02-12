@@ -19,7 +19,7 @@ from .adminTerminal_interface import TerminalWindow
 # Лицензия
 from .license_interface import LicenseAgreementDialog
 # Большие тексты
-from .utils import symbol, warning_message, bible, template_keyLog_text
+from .utils import symbol, warning_message, bible, template_keyLog_text, support_text
 # Файл со стилями
 from .utils.style.style_variables_editable import editable_colors
 # Изменения цвета
@@ -230,6 +230,7 @@ class MainWindow(QMainWindow):
     self.terminal_input.clear()
 
     logging.debug("Добавляем команду в историю вывода")
+    self.terminal_output.append(" ")
     self.terminal_output.append(f"\n<font color='lightBlue'>[username@kraken ~] $</font> {command}\n")
 
     # Обработка ОСОБЫХ команд
@@ -242,6 +243,7 @@ class MainWindow(QMainWindow):
       /terminal -A               Вызов админ панели
       /colorface                 Настройка цвета окна
       /bible                     ?
+      /support                   Информация о 
       ''')
 
     # Узнать состояние подключения
@@ -304,6 +306,8 @@ class MainWindow(QMainWindow):
       self.color_interface = ColorChangerApp(parent=self)  # Передаем ссылку на родительское окно
       self.color_interface.show()
 
+    elif command == "/support":
+      self.terminal_output.append(support_text)
 
 
 

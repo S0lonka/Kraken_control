@@ -1,6 +1,6 @@
 ![](resources/img/imgReadme/kraken_background.jpg)
 
-# Guide
+# Start Guide 
 1. Запускаем файл build.py (Для сборки нужного файла)
 2. запускаем app/main.py -> main - основной интерфейс / Enter - запуситить со стратового интерфеса
 

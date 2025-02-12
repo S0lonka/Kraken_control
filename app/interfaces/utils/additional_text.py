@@ -82,3 +82,12 @@ template_keyLog_text = '''
 # Сохраняем текст который принимает кей логгер
 keyLog_text = ""
 '''
+
+# Текст при комманде /support в терминале
+support_text = '''Creators:
+~ S0lonka
+~ alicebless
+
+Support mail:
+krakensupport@gmail.com
+'''

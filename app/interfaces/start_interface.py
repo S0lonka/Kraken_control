@@ -197,6 +197,8 @@ class StartWindow(QMainWindow):
     asyncio.create_task(self.run_MainWindow())
 
 
+  # Создание Клиента в БД
+
   @asyncSlot()
   async def connect_to_db(self):
     """
