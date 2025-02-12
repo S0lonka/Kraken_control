@@ -10,7 +10,7 @@ a = Analysis(
     ],
     binaries=[],
     datas=[
-        ('c:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\imgReadme', 'resources\\img\\imgReadme'),
+        ('c:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\app\\interfaces\\resources\\kraken.jpg', 'resources/img/imgReadme'),
     ],
     hiddenimports=['interfaces'],
     hookspath=[],
