@@ -27,7 +27,7 @@ class StartWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
+    self.setWindowIcon(QIcon("resources/img/imgReadme/"))
 
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
 
@@ -92,7 +92,7 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.title_label)
     # Логотип
     self.logo_label = QLabel()
-    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme/kraken.jpg").scaled(200, 200, Qt.KeepAspectRatio))
+    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme").scaled(200, 200, Qt.KeepAspectRatio))
     self.logo_label.setAlignment(Qt.AlignCenter)
     self.main_layout.addWidget(self.logo_label)
     # Кнопка START
@@ -227,7 +227,7 @@ class StartWindow(QMainWindow):
     port = self.port_input.text()
 
     # Подключаемся к базе данных (файл sqlite.db)
-    conn = sqlite3.connect('sqlite.db')
+    conn = sqlite3.connect('app/sqlite.db')
     cursor = conn.cursor()
 
     try:
@@ -267,7 +267,7 @@ class StartWindow(QMainWindow):
     Проверяет наличие данных в БД и отображает их в таблице, если данные есть.
     """
     try:
-      conn = sqlite3.connect("sqlite.db")
+      conn = sqlite3.connect("app/sqlite.db")
       cursor = conn.cursor()
       # Проверка наличия данных в таблице (предположим, что таблица называется 'connection_table')
       cursor.execute("SELECT name, ip, port FROM connection_table")
