@@ -175,12 +175,24 @@ class StartWindow(QMainWindow):
   @asyncSlot()
   async def create_database(self):
     """
-    Создает SQLite таблицу, если IP корректен.
+    Создает SQLite таблицу или добавляет туда даные
     """
+
+    # передаём записанные данные в переменную
+    name = self.name_input.text().strip()
     ip = self.ip_input.text().strip()
+    port = self.port_input.text().strip()
+
+    # Проверка что ip правелен
     if not self.validate_ip(ip):
       QMessageBox.warning(self, "Ошибка", "Некорректный IP")
       return
+
+    # Проверяем, что все поля заполнены
+    if not name or not ip or not port:
+      QMessageBox.warning(self, "Ошибка", "Заполните все поля")
+      return
+
 
     # Получаем путь и имя базы данных
     path = self.path_input.text().strip()
@@ -188,17 +200,67 @@ class StartWindow(QMainWindow):
       QMessageBox.warning(self, "Ошибка", "Выберите путь для создания файла")
       return
 
-
     # Показываем сообщение о начале загрузки
     QMessageBox.information(self, "Информация", "Загрузка .exe client начнётся после нажатия ОК, не закрывайте окно")
     
+
     '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
+
+
+    # Заносим данные в БД (потом добавлять только если клиент успешно упакован)
+    self.create_client_db()
+
     #todo Запуск Терминала
     asyncio.create_task(self.run_MainWindow())
 
 
   # Создание Клиента в БД
+  @asyncSlot()
+  async def create_client_db(self):
+    """
+    Создает таблицу в базе данных SQLite (если её нет) и добавляет в неё данные, введенные пользователем.
+    """
 
+    # Получаем данные из полей ввода
+    name = self.name_input.text()
+    ip = self.ip_input.text()
+    port = self.port_input.text()
+
+    # Подключаемся к базе данных (файл sqlite.db)
+    conn = sqlite3.connect('sqlite.db')
+    cursor = conn.cursor()
+
+    try:
+      # Создаем таблицу, если её нет
+      cursor.execute('''
+        CREATE TABLE IF NOT EXISTS connection_table (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          ip TEXT NOT NULL,
+          port TEXT NOT NULL
+        )
+      ''')
+
+      # Вставляем данные в таблицу
+      cursor.execute('''
+        INSERT INTO connection_table (name, ip, port)
+        VALUES (?, ?, ?)
+      ''', (name, ip, port))
+
+      # Сохраняем изменения
+      conn.commit()
+      print("Данные успешно добавлены в таблицу!")
+
+    except sqlite3.Error as e:
+      print(f"Ошибка при работе с базой данных: {e}")
+
+    finally:
+      # Закрываем соединение с базой данных
+      conn.close()
+
+
+
+  # Отображает таблицу если она есть
   @asyncSlot()
   async def connect_to_db(self):
     """
@@ -248,10 +310,12 @@ class StartWindow(QMainWindow):
         # Если данных нет, выводим сообщение
         QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
     except sqlite3.Error as e:
-      QMessageBox.critical(self, "Ошибка", f"Ошибка при подключении к базе данных: {e}, Возможно БД ещё несоздана")
+      QMessageBox.critical(self, "Ошибка", f"Возможно БД ещё несоздана. Ошибка при подключении к базе данных: {e}")
     finally:
       if conn:
         conn.close()
+
+
 
   # Очистка интерфейса
   def clear_interface(self):
