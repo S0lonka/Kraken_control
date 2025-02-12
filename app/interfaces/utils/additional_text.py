@@ -89,5 +89,5 @@ support_text = '''Creators:
 ~ alicebless
 
 Support mail:
-krakensupport@gmail.com
+kraken.no.sup@gmail.com
 '''
