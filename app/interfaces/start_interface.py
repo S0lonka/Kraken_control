@@ -1,11 +1,11 @@
 import sys
 import sqlite3
 import asyncio
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
+from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
                             QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog,
                             QMainWindow, QTableWidget, QTableWidgetItem, QTextEdit)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
 
 #* Импорты моих библиотек
@@ -85,7 +85,7 @@ class StartWindow(QMainWindow):
     self.central_widget = QWidget()
     self.setCentralWidget(self.central_widget)
     self.main_layout = QVBoxLayout(self.central_widget)
-    self.main_layout.setAlignment(Qt.AlignCenter)  # Выравнивание по центру
+    self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Выравнивание по центру
     # Надпись "Hack with KRAKEN"
     self.title_label = QLabel("Hack with KRAKEN")
     self.title_label.setAlignment(Qt.AlignCenter)

@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QSlider, QLineEdit, QPushButton, QLabel, QHBoxLayout
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSlider, QLineEdit, QPushButton, QLabel, QHBoxLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
 
 from .utils.style.style_variables_base import base_colors  # Импортируем общий словарь
 from .utils.style.style_variables_editable import editable_colors

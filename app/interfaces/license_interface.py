@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QTextEdit, QCheckBox, QDialog, QApplication, QLabel
+from PyQt6.QtWidgets import QVBoxLayout, QPushButton, QTextEdit, QCheckBox, QDialog, QApplication, QLabel
 import sys
 # Импорт текста соглашения
 from interfaces.utils import license_agreement

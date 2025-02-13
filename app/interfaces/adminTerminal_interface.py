@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QTextCursor, QFont
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QTextCursor, QFont
 from qasync import asyncSlot
 
 #! Терминал внутри ОКНА С ТЕРМИНАЛОМ

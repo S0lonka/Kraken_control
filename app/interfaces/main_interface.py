@@ -3,11 +3,11 @@ import shutil
 import sys
 import sqlite3
 import asyncio
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit, QMessageBox, QDialog)
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QIcon
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QIcon
 from qasync import asyncSlot, QEventLoop
 # import discordrp
 import logging
