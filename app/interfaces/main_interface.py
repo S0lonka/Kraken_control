@@ -149,7 +149,7 @@ class MainWindow(QMainWindow):
     self.server_running = False
     self.clientid = "1337766338621607997"
 
-    # Устанавливаем что кейлоггер не активен(чтобы незагружать систему)
+    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
     self.keylogger_active = False
 
 
@@ -182,12 +182,12 @@ class MainWindow(QMainWindow):
     self.terminal_input.returnPressed.connect(self.execute_command)
     logging.debug("Подключен обработчик выполнения команд")
 
-    # Вывод картинки и предупреждения в терминал, из фйла (additional_text.py - это файл для доп тектов)
+    # Вывод картинки и предупреждения в терминал, из файла (additional_text.py - это файл для доп текстов)
     self.terminal_output.append(symbol)
     self.terminal_output.append(warning_message)
     logging.info("Предупреждение отображено в терминале")
 
-  # Функция подключения к clitnt
+  # Функция подключения к client
   async def handle_client(self, reader, writer):
     logging.debug("сопряжение с клиентом прошло успешно")
     self.reader = reader
@@ -628,7 +628,7 @@ class MainWindow(QMainWindow):
     for i in reversed(range(self.content_layout.count())):
       self.content_layout.itemAt(i).widget().setParent(None)
 
-    # Устанавливаем что кейлоггер не активен(чтобы незагружать систему)
+    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
     self.keylogger_active = False
 
 

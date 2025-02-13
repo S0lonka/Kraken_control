@@ -40,7 +40,7 @@ def mainwindow():
     sys.exit()  # Завершаем программу, если лицензия не принята
 
 if __name__ == "__main__":
-  a = input("Введите main или простонажмите enter\n")
+  a = input("Введите main или просто нажмите enter\n")
   if a == "main":
     mainwindow()
   else:

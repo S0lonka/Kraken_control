@@ -175,7 +175,7 @@ class StartWindow(QMainWindow):
   @asyncSlot()
   async def create_database(self):
     """
-    Создает SQLite таблицу или добавляет туда даные
+    Создает SQLite таблицу или добавляет туда данные
     """
 
     # передаём записанные данные в переменную
@@ -183,7 +183,7 @@ class StartWindow(QMainWindow):
     ip = self.ip_input.text().strip()
     port = self.port_input.text().strip()
 
-    # Проверка что ip правелен
+    # Проверка что ip правилен
     if not self.validate_ip(ip):
       QMessageBox.warning(self, "Ошибка", "Некорректный IP")
       return
@@ -310,7 +310,7 @@ class StartWindow(QMainWindow):
         # Если данных нет, выводим сообщение
         QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
     except sqlite3.Error as e:
-      QMessageBox.critical(self, "Ошибка", f"Возможно БД ещё несоздана. Ошибка при подключении к базе данных: {e}")
+      QMessageBox.critical(self, "Ошибка", f"Возможно БД ещё не создана. Ошибка при подключении к базе данных: {e}")
     finally:
       if conn:
         conn.close()
