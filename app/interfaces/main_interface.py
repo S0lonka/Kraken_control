@@ -341,7 +341,7 @@ class MainWindow(QMainWindow):
 
     logging.debug("Создание метки для видео")
     self.video_label = QLabel("Здесь будет видео")
-    self.video_label.setAlignment(Qt.AlignCenter)
+    self.video_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     logging.debug("Добавление метки в макет")
     self.content_layout.addWidget(self.video_label)
@@ -428,7 +428,7 @@ class MainWindow(QMainWindow):
 
     logging.debug("Создание метки для отображения информации")
     self.info_label = QLabel()
-    self.info_label.setAlignment(Qt.AlignLeft)
+    self.info_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     info_text = f"""
     Вывод1 - [Переменная1]
@@ -692,31 +692,3 @@ class MainWindow(QMainWindow):
         color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
     """)
-
-
-
-
-
-
-#! ЗАПУСК ПРОГРАММЫ
-if __name__ == "__main__":
-  # Очистка логов (удаление файла)
-  if os.path.exists("kraken.log"):
-    # Очищаем файл
-    with open("kraken.log", 'w') as file:
-      pass
-
-  app = QApplication(sys.argv)
-  loop = QEventLoop(app)
-  asyncio.set_event_loop(loop)
-
-  #* Проверка что в окне с лицензии, пользователь подтвердил соглашение
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
-    # Запуск окна
-    main_window = MainWindow()
-    main_window.show()
-
-    with loop:
-      loop.run_forever()
-  else:
-    sys.exit()  # Завершаем программу, если лицензия не принята

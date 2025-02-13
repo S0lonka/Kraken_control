@@ -72,7 +72,7 @@ class ColorChangerApp(QWidget):
       hbox.addWidget(label)
 
       # Ползунок
-      slider = QSlider(Qt.Horizontal)
+      slider = QSlider(Qt.Orientation.Horizontal)
       slider.setMinimum(0)
       slider.setMaximum(16777215)  # Диапазон HEX (000000 до FFFFFF)
       slider.setValue(int(default_color, 16))  # Начальное значение
@@ -195,10 +195,3 @@ editable_colors = {editable_colors}
 
     # Сохраняем изменения в файл style_variables.py
     self.save_editable_colors_to_file()
-
-
-if __name__ == '__main__':
-  app = QApplication(sys.argv)
-  ex = ColorChangerApp()
-  ex.show()
-  sys.exit(app.exec_())
