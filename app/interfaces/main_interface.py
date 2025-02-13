@@ -1,11 +1,8 @@
-import os
-import shutil
-import sys
 import sqlite3
 import asyncio
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
-                             QTableWidgetItem, QLineEdit, QMessageBox, QDialog)
+                             QTableWidgetItem, QLineEdit, QMessageBox)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon
 from qasync import asyncSlot, QEventLoop
@@ -16,8 +13,6 @@ import logging
 #* Импорты моих модулей
 # Админ терминал
 from .adminTerminal_interface import TerminalWindow
-# Лицензия
-from .license_interface import LicenseAgreementDialog
 # Большие тексты
 from .utils import symbol, warning_message, bible, template_keyLog_text, support_text
 # Файл со стилями

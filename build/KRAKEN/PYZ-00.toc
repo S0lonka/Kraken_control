@@ -1,6 +1,6 @@
 ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\build\\KRAKEN\\PYZ-00.pyz',
- [('PyQt5',
-   'C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\.venv\\Lib\\site-packages\\PyQt5\\__init__.py',
+ [('PyQt6',
+   'C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\.venv\\Lib\\site-packages\\PyQt6\\__init__.py',
    'PYMODULE'),
   ('_compat_pickle',
    'C:\\Program '

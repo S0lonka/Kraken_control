@@ -15,7 +15,7 @@ def main():
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  if LicenseAgreementDialog().exec() == QDialog.accepted:
+  if LicenseAgreementDialog().exec() == QDialog.DialogCode.Accepted:
     start_window = StartWindow()
     start_window.show()
 
@@ -24,19 +24,6 @@ def main():
   else:
     sys.exit()  # Завершаем программу, если лицензия не принята
 
-def mainwindow():
-  app = QApplication(sys.argv)
-  loop = QEventLoop(app)
-  asyncio.set_event_loop(loop)
-
-  if LicenseAgreementDialog().exec() == QDialog.accepted:
-    main_window = MainWindow()
-    main_window.show()
-
-    with loop:
-      loop.run_forever()
-  else:
-    sys.exit()  # Завершаем программу, если лицензия не принята
 
 if __name__ == "__main__":
   main()

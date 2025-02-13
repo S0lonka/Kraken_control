@@ -5,18 +5,17 @@ a = Analysis(
     ['app\\KRAKEN.py'],
     pathex=[
     'C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\.venv\\Lib\\site-packages',  # Путь к qasync
-    'app',  # Путь к папке app
-    'C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\app\\interfaces\\utils\\resource'
+    'app'  # Путь к папке app
     ],
     binaries=[],
     datas=[
-        ('c:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\app\\interfaces\\resources\\kraken.jpg', 'resources/img/imgReadme'),
+        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\imgReadme\\kraken.jpg', 'img')
     ],
     hiddenimports=['interfaces'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=["PyQt5"],
     noarchive=False,
     optimize=0,
 )

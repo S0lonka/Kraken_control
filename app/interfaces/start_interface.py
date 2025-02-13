@@ -1,24 +1,34 @@
-import sys
 import sqlite3
-import asyncio
-from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
-                            QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog,
-                            QMainWindow, QTableWidget, QTableWidgetItem, QTextEdit)
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, 
+                            QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog,
+                            QMainWindow, QTableWidget, QTableWidgetItem)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
-from qasync import asyncSlot, QEventLoop
+from qasync import asyncSlot
 
 #* Импорты моих библиотек
 # Основное окно
 from .main_interface import MainWindow
-# Лицензия
-from .license_interface import LicenseAgreementDialog
 # Файл со стилями
 from .utils.style.style_variables_editable import editable_colors
 
+import os
+import sys
+
+def resource_path(relative_path):
+  """ Получить абсолютный путь к ресурсу. """
+  if hasattr(sys, '_MEIPASS'):
+    # Если приложение собрано в один файл (--onefile)
+    base_path = sys._MEIPASS
+  else:
+    # Если приложение запущено из исходного кода
+    base_path = os.path.abspath(".")
+
+  return os.path.join(base_path, relative_path)
+
+
 
 #! Класс Стартового окна
-
 class StartWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -27,7 +37,8 @@ class StartWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.setWindowIcon(QIcon("resources/img/imgReadme/"))
+    icon_path = resource_path("img/kraken.jpg")
+    self.setWindowIcon(QIcon(icon_path))
 
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
 
@@ -92,7 +103,8 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.title_label)
     # Логотип
     self.logo_label = QLabel()
-    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme").scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
+    icon_path = resource_path("img/kraken.jpg")
+    self.logo_label.setPixmap(QPixmap(icon_path).scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
     self.logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     self.main_layout.addWidget(self.logo_label)
     # Кнопка START
@@ -162,8 +174,7 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
   # Выбор пути для сохранения файла
-  @asyncSlot()
-  async def select_path(self):
+  def select_path(self):
     """
     Открывает проводник для выбора пути.
     """
@@ -206,12 +217,12 @@ class StartWindow(QMainWindow):
 
     '''ТУТ БУДЕТ ФУНКЦИЯ УПАКОВКИ СКРИПТА'''
 
-
+    self.run_MainWindow()
     # Заносим данные в БД (потом добавлять только если клиент успешно упакован)
     self.create_client_db()
 
     #todo Запуск Терминала
-    await self.run_MainWindow()
+    
 
 
   # Создание Клиента в БД
@@ -372,10 +383,10 @@ class StartWindow(QMainWindow):
     return True
 
   #TODO: Функция Смены окон и открытия основного
-  @asyncSlot()
-  async def run_MainWindow(self):
-    # Скрываем нынешнее окно
+  def run_MainWindow(self):
     self.hide()
     # Создаём и отображаем новое окно
     self.main_window = MainWindow()
     self.main_window.show()
+    # self.main_window.raise_()  # Поднимаем окно наверх
+    # self.main_window.activateWindow()  # Активируем окно
