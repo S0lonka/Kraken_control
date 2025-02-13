@@ -1,7 +1,7 @@
 # Запуск приложения
 import sys
 import asyncio
-from PyQt5.QtWidgets import (QApplication,QDialog)
+from PyQt6.QtWidgets import (QApplication,QDialog)
 from qasync import QEventLoop
 
 # Импорты моих модулей
@@ -15,7 +15,7 @@ def main():
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+  if LicenseAgreementDialog().exec() == QDialog.accepted:
     start_window = StartWindow()
     start_window.show()
 
@@ -29,7 +29,7 @@ def mainwindow():
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+  if LicenseAgreementDialog().exec() == QDialog.accepted:
     main_window = MainWindow()
     main_window.show()
 

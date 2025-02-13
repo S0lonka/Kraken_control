@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QTextCursor, QFont
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QTextCursor, QFont
 from qasync import asyncSlot
 
 #! Терминал внутри ОКНА С ТЕРМИНАЛОМ
@@ -8,17 +8,17 @@ class Terminal(QTextEdit):
   def __init__(self):
     super().__init__()
     self.setFont(QFont("Courier", 10))
-    self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-    self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    self.setLineWrapMode(QTextEdit.NoWrap)
+    self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+    self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    self.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
     self.setReadOnly(False)
     self.setText("> ")
     self.cursor = self.textCursor()
-    self.cursor.movePosition(QTextCursor.End)
+    self.cursor.movePosition(QTextCursor.MoveOperation.End)
     self.setTextCursor(self.cursor)
 
   def keyPressEvent(self, event):
-    if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+    if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
       self.process_command()
     else:
       super().keyPressEvent(event)
@@ -26,10 +26,10 @@ class Terminal(QTextEdit):
   @asyncSlot()
   async def process_command(self):
     cursor = self.textCursor()
-    cursor.movePosition(QTextCursor.End)
-    cursor.select(QTextCursor.LineUnderCursor)
+    cursor.movePosition(QTextCursor.MoveOperation.End)
+    cursor.select(QTextCursor.MoveOperation.StartOfLine)
     command = cursor.selectedText()[2:]  # Убираем "> " из команды
-    cursor.movePosition(QTextCursor.End)
+    cursor.movePosition(QTextCursor.MoveOperation.End)
     cursor.insertText("\n")
 
     if command == "/help":
@@ -39,7 +39,7 @@ class Terminal(QTextEdit):
       self.append(f"Unknown command: {command}")
 
     self.append("> ")
-    cursor.movePosition(QTextCursor.End)
+    cursor.movePosition(QTextCursor.MoveOperation.End)
     self.setTextCursor(cursor)
 
 

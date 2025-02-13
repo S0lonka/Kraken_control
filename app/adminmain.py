@@ -1,7 +1,7 @@
 # Запуск приложения
 import sys
 import asyncio
-from PyQt5.QtWidgets import (QApplication,QDialog)
+from PyQt6.QtWidgets import (QApplication,QDialog)
 from qasync import QEventLoop
 
 # Импорты моих модулей
@@ -15,13 +15,14 @@ def main():
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+  if LicenseAgreementDialog().exec() == QDialog.DialogCode.Accepted:
     start_window = StartWindow()
     start_window.show()
 
     with loop:
       loop.run_forever()
   else:
+    print("by")
     sys.exit()  # Завершаем программу, если лицензия не принята
 
 def mainwindow():
@@ -29,7 +30,7 @@ def mainwindow():
   loop = QEventLoop(app)
   asyncio.set_event_loop(loop)
 
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
+  if LicenseAgreementDialog().exec() == QDialog.DialogCode.Accepted:
     main_window = MainWindow()
     main_window.show()
 

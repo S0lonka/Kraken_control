@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QTextEdit, QCheckBox, QDialog, QApplication, QLabel
+from PyQt6.QtWidgets import QVBoxLayout, QPushButton, QTextEdit, QCheckBox, QDialog, QApplication, QLabel
 import sys
 # Импорт текста соглашения
 from interfaces.utils import license_agreement
@@ -49,14 +49,3 @@ class LicenseAgreementDialog(QDialog):
       self.next_button.setEnabled(True)
     else:
       self.next_button.setEnabled(False)
-
-if __name__ == "__main__":
-  app = QApplication(sys.argv)  # Создаем экземпляр приложения
-  license_window = LicenseAgreementDialog()  # Создаем экземпляр диалогового окна
-
-  if license_window.exec_() == QDialog.Accepted:  # Показываем диалог и проверяем результат
-    print("Пользователь согласился с условиями")
-  else:
-    print("Пользователь не согласился с условиями")
-
-  sys.exit(app.exec_())  # Запускаем главный цикл приложения и завершаем программу

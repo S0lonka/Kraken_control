@@ -1,11 +1,11 @@
 import sys
 import sqlite3
 import asyncio
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
+from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
                             QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog, QDialog,
                             QMainWindow, QTableWidget, QTableWidgetItem, QTextEdit)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap
 from qasync import asyncSlot, QEventLoop
 
 #* Импорты моих библиотек
@@ -85,21 +85,21 @@ class StartWindow(QMainWindow):
     self.central_widget = QWidget()
     self.setCentralWidget(self.central_widget)
     self.main_layout = QVBoxLayout(self.central_widget)
-    self.main_layout.setAlignment(Qt.AlignCenter)  # Выравнивание по центру
+    self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Выравнивание по центру
     # Надпись "Hack with KRAKEN"
     self.title_label = QLabel("Hack with KRAKEN")
-    self.title_label.setAlignment(Qt.AlignCenter)
+    self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     self.main_layout.addWidget(self.title_label)
     # Логотип
     self.logo_label = QLabel()
-    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme").scaled(200, 200, Qt.KeepAspectRatio))
-    self.logo_label.setAlignment(Qt.AlignCenter)
+    self.logo_label.setPixmap(QPixmap("resources/img/imgReadme").scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
+    self.logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     self.main_layout.addWidget(self.logo_label)
     # Кнопка START
     self.start_button = QPushButton("START")
     self.start_button.setFixedSize(150, 50)  # Фиксированный размер кнопки
     self.start_button.clicked.connect(self.change_interface)
-    self.main_layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
+    self.main_layout.addWidget(self.start_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
   @asyncSlot()
   async def change_interface(self):
@@ -131,7 +131,7 @@ class StartWindow(QMainWindow):
     # Кнопка "Назад" в верхнем левом углу
     self.back_button = QPushButton("Назад")
     self.back_button.clicked.connect(self.change_interface)
-    self.main_layout.addWidget(self.back_button, alignment=Qt.AlignLeft | Qt.AlignTop)
+    self.main_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
     # Поле для выбора пути
     self.path_layout = QHBoxLayout()
@@ -159,7 +159,7 @@ class StartWindow(QMainWindow):
     # Кнопка "Создать"
     self.create_db_button = QPushButton("Создать")
     self.create_db_button.clicked.connect(self.create_database)
-    self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignCenter)
+    self.main_layout.addWidget(self.create_db_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
   # Выбор пути для сохранения файла
   @asyncSlot()
@@ -211,7 +211,7 @@ class StartWindow(QMainWindow):
     self.create_client_db()
 
     #todo Запуск Терминала
-    asyncio.create_task(self.run_MainWindow())
+    await self.run_MainWindow()
 
 
   # Создание Клиента в БД
@@ -285,13 +285,13 @@ class StartWindow(QMainWindow):
         # Кнопка "Назад" в верхнем левом углу
         self.back_button = QPushButton("Назад")
         self.back_button.clicked.connect(self.change_interface)
-        self.top_layout.addWidget(self.back_button, alignment=Qt.AlignLeft | Qt.AlignTop)
+        self.top_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         # Добавляем верхний макет в основной макет
         self.main_layout.addLayout(self.top_layout)
 
         # Заголовок
-        self.main_layout.addWidget(QLabel("Ваши поклонники", alignment=Qt.AlignCenter))
+        self.main_layout.addWidget(QLabel("Ваши поклонники", alignment=Qt.AlignmentFlag.AlignCenter))
 
         # Создаем таблицу
         self.table = QTableWidget(len(result), 3)
@@ -305,7 +305,7 @@ class StartWindow(QMainWindow):
         # Добавляем кнопку "Продолжить"
         self.continue_button = QPushButton("Продолжить")
         self.continue_button.clicked.connect(self.run_MainWindow)
-        self.main_layout.addWidget(self.continue_button, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.continue_button, alignment=Qt.AlignmentFlag.AlignCenter)
       else:
         # Если данных нет, выводим сообщение
         QMessageBox.information(self, "Нет данных", ":( У вас пока нету поклонников")
@@ -339,16 +339,19 @@ class StartWindow(QMainWindow):
     """
     Рекурсивно очищает макет и удаляет все его виджеты и вложенные макеты.
     """
+    if layout is None:
+      return
+
     while layout.count():
       item = layout.takeAt(0)
       if item.widget():
-        # Удаляем виджет
         widget = item.widget()
         widget.setParent(None)
         widget.deleteLater()
       elif item.layout():
-        # Рекурсивно очищаем вложенный макет
         self._clear_layout(item.layout())
+      elif item.spacerItem():
+        layout.removeItem(item)
 
 
   # Проверка что ip введён правильно
@@ -376,22 +379,3 @@ class StartWindow(QMainWindow):
     # Создаём и отображаем новое окно
     self.main_window = MainWindow()
     self.main_window.show()
-
-
-
-
-
-# ЗАПУСК 
-if __name__ == "__main__":
-  app = QApplication(sys.argv)
-  loop = QEventLoop(app)
-  asyncio.set_event_loop(loop)
-
-  if LicenseAgreementDialog().exec_() == QDialog.Accepted:
-    start_window = StartWindow()
-    start_window.show()
-
-    with loop:
-      loop.run_forever()
-  else:
-    sys.exit()  # Завершаем программу, если лицензия не принята
