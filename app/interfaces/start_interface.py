@@ -211,7 +211,7 @@ class StartWindow(QMainWindow):
     self.create_client_db()
 
     #todo Запуск Терминала
-    asyncio.create_task(self.run_MainWindow())
+    await self.run_MainWindow()
 
 
   # Создание Клиента в БД
