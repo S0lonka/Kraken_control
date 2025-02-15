@@ -15,6 +15,7 @@ from .utils.style.style_variables_editable import editable_colors
 import os
 import sys
 
+# Функция для получения иконки в exe
 def resource_path(relative_path):
   """ Получить абсолютный путь к ресурсу. """
   if hasattr(sys, '_MEIPASS'):

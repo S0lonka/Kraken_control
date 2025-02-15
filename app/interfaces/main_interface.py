@@ -1,11 +1,13 @@
 import sqlite3
+import os
+import sys
 import asyncio
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit, QMessageBox)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon
-from qasync import asyncSlot, QEventLoop
+from qasync import asyncSlot
 # import discordrp
 import logging
 
@@ -33,6 +35,18 @@ logging.basicConfig(
     ]
 )
 
+# Функция для получения иконки в exe
+def resource_path(relative_path):
+  """ Получить абсолютный путь к ресурсу. """
+  if hasattr(sys, '_MEIPASS'):
+    # Если приложение собрано в один файл (--onefile)
+    base_path = sys._MEIPASS
+  else:
+    # Если приложение запущено из исходного кода
+    base_path = os.path.abspath(".")
+
+  return os.path.join(base_path, relative_path)
+
 
 #! Класс Основного окна
 class MainWindow(QMainWindow):
@@ -43,7 +57,8 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.setWindowIcon(QIcon("app/interfaces/utils/resource/kraken.jpg"))
+    icon_path = resource_path("img/kraken.jpg")
+    self.setWindowIcon(QIcon(icon_path))
 
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
