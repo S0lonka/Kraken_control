@@ -1,10 +1,31 @@
+import os
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSlider, QLineEdit, QPushButton, QLabel, QHBoxLayout
+import shutil
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSlider, QLineEdit, QPushButton, QLabel, QHBoxLayout
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 
 from .utils.style.style_variables_base import base_colors  # Импортируем общий словарь
 from .utils.style.style_variables_editable import editable_colors
+
+# Функция для получения пути уже в exe
+def resource_path(relative_path):
+  """ Получить абсолютный путь к ресурсу. """
+  if hasattr(sys, '_MEIPASS'):
+    # Если приложение собрано в один файл (--onefile)
+    base_path = sys._MEIPASS
+  else:
+    # Если приложение запущено из исходного кода
+    base_path = os.path.abspath(".")
+
+  return os.path.join(base_path, relative_path)
+
+def ensure_file_exists(source_path, destination_path):
+    """Создает копию файла, если он отсутствует в постоянной папке."""
+    if not os.path.exists(destination_path):
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        shutil.copy(source_path, destination_path)
+    return destination_path
 
 class ColorChangerApp(QWidget):
   def __init__(self, parent=None):
@@ -15,7 +36,8 @@ class ColorChangerApp(QWidget):
   def initUI(self):
     self.setWindowTitle('KRAKEN - Color Changer')
     self.setGeometry(100, 100, 400, 600)
-    self.setWindowIcon(QIcon("app/interfaces/utils/resource/kraken.jpg"))
+    self.icon_path = resource_path("img/kraken.jpg")
+    self.setWindowIcon(QIcon(self.icon_path))
 
     self.setStyleSheet(f"""
       QWidget {{
@@ -173,8 +195,17 @@ class ColorChangerApp(QWidget):
 editable_colors = {editable_colors}
 """
 
+    # Получаем путь файла
+    self.style_variables_editable_path = resource_path("app/interfaces/utils/style/style_variables_editable.py")
+
+    # Путь к файлу в постоянной папке (например, рядом с исполняемым файлом)
+    self.persistent_folder = os.path.dirname(sys.executable)  # Папка с исполняемым файлом
+    self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
+
+    # Убеждаемся, что файл существует в постоянной папке
+    ensure_file_exists(self.style_variables_editable_path, self.destination_file)
     # Записываем в файл
-    with open("app/interfaces/utils/style/style_variables_editable.py", "w", encoding="utf-8") as file:
+    with open(self.destination_file, "w", encoding="utf-8") as file:
       file.write(file_content)
     
     # Обновляем стили в родительском окне

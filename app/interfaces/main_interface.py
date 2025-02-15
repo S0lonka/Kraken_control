@@ -44,7 +44,7 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 sys.excepthook = handle_exception
 
 
-# Функция для получения иконки в exe
+# Функция для получения пути уже в exe
 def resource_path(relative_path):
   """ Получить абсолютный путь к ресурсу. """
   if hasattr(sys, '_MEIPASS'):
@@ -66,8 +66,8 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    icon_path = resource_path("img/kraken.jpg")
-    self.setWindowIcon(QIcon(icon_path))
+    self.icon_path = resource_path("img/kraken.jpg")
+    self.setWindowIcon(QIcon(self.icon_path))
 
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
@@ -409,7 +409,9 @@ class MainWindow(QMainWindow):
     Загружает текст из файла keyLog_text.py.
     """
     try:
-      with open("app/interfaces/utils/keyLog_text.py", "r", encoding="utf-8") as file:
+      # Получаем путь к файлу
+      self.keyLog_text_path = resource_path("app/interfaces/utils/keyLog_text.py")
+      with open(self.keyLog_text_path, "r", encoding="utf-8") as file:
         # Ищем строку с keyLog_text и извлекаем её значение
         for line in file:
           if line.startswith("keyLog_text ="):
@@ -433,7 +435,9 @@ class MainWindow(QMainWindow):
     """
     Очищает текст в переменной и в текстовом поле.
     """
-    with open("app/interfaces/utils/keyLog_text.py", "w", encoding="utf-8") as file:
+    # Получаем путь к файлу
+    self.keyLog_text_path = resource_path("app/interfaces/utils/keyLog_text.py")
+    with open(self.keyLog_text_path, "w", encoding="utf-8") as file:
       file.write(template_keyLog_text)
     self.text_edit.setText("")  # Очищаем текстовое поле
 

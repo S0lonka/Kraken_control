@@ -1,7 +1,21 @@
+import os
+import sys
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QTextCursor, QFont
 from qasync import asyncSlot
+
+# Функция для получения иконки в exe
+def resource_path(relative_path):
+  """ Получить абсолютный путь к ресурсу. """
+  if hasattr(sys, '_MEIPASS'):
+    # Если приложение собрано в один файл (--onefile)
+    base_path = sys._MEIPASS
+  else:
+    # Если приложение запущено из исходного кода
+    base_path = os.path.abspath(".")
+
+  return os.path.join(base_path, relative_path)
 
 #! Терминал внутри ОКНА С ТЕРМИНАЛОМ
 class Terminal(QTextEdit):
@@ -55,7 +69,10 @@ class TerminalWindow(QWidget):
     self.initUI()
 
   def initUI(self):
-    self.setWindowIcon(QIcon("resources/img/imgReadme/kraken.jpg"))
+    # Иконка приложения
+    self.icon_path = resource_path("img/kraken.jpg")
+    self.setWindowIcon(QIcon(self.icon_path))
+    
     self.setWindowTitle("KRAKEN - ADMIN TERMINAL")
     self.setGeometry(100, 100, 700, 500)
 

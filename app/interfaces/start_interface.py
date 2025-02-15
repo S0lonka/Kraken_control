@@ -17,7 +17,7 @@ from .utils.style.style_variables_editable import editable_colors
 import os
 import sys
 
-# Функция для получения иконки в exe
+# Функция для получения пути уже в exe
 def resource_path(relative_path):
   """ Получить абсолютный путь к ресурсу. """
   if hasattr(sys, '_MEIPASS'):
@@ -410,6 +410,5 @@ class StartWindow(QMainWindow):
       # Создаём и отображаем новое окно
       self.main_window = MainWindow()
       self.main_window.show()
-      asyncio.get_event_loop().run_forever()
     except Exception as e:
       logging.error("Ошибка при создании MainWindow", exc_info=True)
