@@ -9,15 +9,18 @@ a = Analysis(
     ],
     binaries=[],
     datas=[
-        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\imgReadme\\kraken.jpg', 'img')
+        ('app\\sqlite.db', 'app'),
+        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\imgReadme\\kraken.jpg', 'resources/img')
     ],
-    hiddenimports=['interfaces'],
+    hiddenimports=['interfaces','qasync'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=["PyQt5"],
     noarchive=False,
     optimize=0,
+    debug=True,
+    console=True,
 )
 pyz = PYZ(a.pure)
 

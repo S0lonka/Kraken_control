@@ -7,7 +7,6 @@ from qasync import QEventLoop
 # Импорты моих модулей
 from interfaces.license_interface import LicenseAgreementDialog
 from interfaces.start_interface import StartWindow
-from interfaces.main_interface import MainWindow
 
 
 def main():
@@ -24,6 +23,14 @@ def main():
   else:
     sys.exit()  # Завершаем программу, если лицензия не принята
 
+# Функция очистки логгера
+def log_clear():
+  # Открываем файл в режиме записи, что очищает его содержимое
+  with open("kraken.log", 'w') as file:
+      pass  # Ничего не записываем, просто очищаем файл
+
 
 if __name__ == "__main__":
+  # Очищаем логгер
+  log_clear()
   main()

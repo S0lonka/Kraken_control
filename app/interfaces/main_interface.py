@@ -35,6 +35,15 @@ logging.basicConfig(
     ]
 )
 
+def handle_exception(exc_type, exc_value, exc_traceback):
+    """Обработчик необработанных исключений."""
+    logging.error("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+
+# Перехват необработанных исключений
+sys.excepthook = handle_exception
+
+
 # Функция для получения иконки в exe
 def resource_path(relative_path):
   """ Получить абсолютный путь к ресурсу. """
@@ -62,6 +71,9 @@ class MainWindow(QMainWindow):
 
     # x, y, width, height
     self.setGeometry(200, 100, 1200, 700)
+
+    # Получаем путь к БД
+    self.db_path = resource_path('app/sqlite.db')
 
     # Применяем стили
     self.setStyleSheet(f"""
@@ -149,7 +161,7 @@ class MainWindow(QMainWindow):
     self.show_terminal()
 
     # Подключение к базе данных SQLite
-    self.db_connection = sqlite3.connect("app/sqlite.db")  # Укажите путь к вашей базе данных
+    self.db_connection = sqlite3.connect(self.db_path)  # Укажите путь к вашей базе данных
     self.cursor = self.db_connection.cursor()
 
     # Создаем тестовую таблицу, если её нет

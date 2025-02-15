@@ -1,9 +1,11 @@
+import asyncio
 import sqlite3
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, 
                             QPushButton, QLabel, QLineEdit, QMessageBox, QFileDialog,
                             QMainWindow, QTableWidget, QTableWidgetItem)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
+import logging
 from qasync import asyncSlot
 
 #* Импорты моих библиотек
@@ -27,7 +29,22 @@ def resource_path(relative_path):
 
   return os.path.join(base_path, relative_path)
 
+logging.basicConfig(
+  level=logging.DEBUG,
+  format="%(asctime)s [%(levelname)s] %(message)s",
+  handlers=[
+    logging.FileHandler("kraken.log"),
+    logging.StreamHandler()
+  ]
+)
 
+def handle_exception(exc_type, exc_value, exc_traceback):
+  """Обработчик необработанных исключений."""
+  logging.error("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+
+# Перехват необработанных исключений
+sys.excepthook = handle_exception
 
 #! Класс Стартового окна
 class StartWindow(QMainWindow):
@@ -38,10 +55,13 @@ class StartWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    icon_path = resource_path("img/kraken.jpg")
-    self.setWindowIcon(QIcon(icon_path))
+    self.icon_path = resource_path("resources/img/kraken.jpg")
+    self.setWindowIcon(QIcon(self.icon_path))
 
     self.setGeometry(350, 100, 800, 600)  # x, y, width, height
+
+    # Получаем путь к БД
+    self.db_path = resource_path('app/sqlite.db')
 
     # Применяем стили
     self.setStyleSheet(f"""
@@ -104,8 +124,8 @@ class StartWindow(QMainWindow):
     self.main_layout.addWidget(self.title_label)
     # Логотип
     self.logo_label = QLabel()
-    icon_path = resource_path("img/kraken.jpg")
-    self.logo_label.setPixmap(QPixmap(icon_path).scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
+    # icon_path = resource_path("resources/img/kraken.jpg")
+    self.logo_label.setPixmap(QPixmap(self.icon_path).scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
     self.logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     self.main_layout.addWidget(self.logo_label)
     # Кнопка START
@@ -239,7 +259,7 @@ class StartWindow(QMainWindow):
     port = self.port_input.text()
 
     # Подключаемся к базе данных (файл sqlite.db)
-    conn = sqlite3.connect('app/sqlite.db')
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
 
     try:
@@ -279,7 +299,7 @@ class StartWindow(QMainWindow):
     Проверяет наличие данных в БД и отображает их в таблице, если данные есть.
     """
     try:
-      conn = sqlite3.connect("app/sqlite.db")
+      conn = sqlite3.connect(self.db_path)
       cursor = conn.cursor()
       # Проверка наличия данных в таблице (предположим, что таблица называется 'connection_table')
       cursor.execute("SELECT name, ip, port FROM connection_table")
@@ -385,9 +405,11 @@ class StartWindow(QMainWindow):
 
   #TODO: Функция Смены окон и открытия основного
   def run_MainWindow(self):
-    self.hide()
-    # Создаём и отображаем новое окно
-    self.main_window = MainWindow()
-    self.main_window.show()
-    # self.main_window.raise_()  # Поднимаем окно наверх
-    # self.main_window.activateWindow()  # Активируем окно
+    try:
+      self.hide()
+      # Создаём и отображаем новое окно
+      self.main_window = MainWindow()
+      self.main_window.show()
+      asyncio.get_event_loop().run_forever()
+    except Exception as e:
+      logging.error("Ошибка при создании MainWindow", exc_info=True)
