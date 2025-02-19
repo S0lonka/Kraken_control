@@ -4,7 +4,7 @@ import sys
 import asyncio
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
-                             QTableWidgetItem, QLineEdit, QMessageBox)
+                             QTableWidgetItem, QLineEdit, QMessageBox, QMenu)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon
 from qasync import asyncSlot
@@ -535,6 +535,8 @@ class MainWindow(QMainWindow):
     self.scroll_area.setWidgetResizable(True)
 
     self.table_widget = QTableWidget()
+    self.table_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)  # Включаем контекстное меню
+    self.table_widget.customContextMenuRequested.connect(self.show_context_menu)  # Подключаем обработчик
     self.scroll_area.setWidget(self.table_widget)
 
     # Добавляем контейнеры с полями ввода и таблицу в layout
@@ -544,6 +546,34 @@ class MainWindow(QMainWindow):
 
     # Обновляем таблицу данными из базы данных
     await self.update_table()
+
+  #* Контекстное меню для таблицы
+  def show_context_menu(self, position):
+    """
+    Показывает контекстное меню при клике правой кнопкой мыши на ячейку первого столбца.
+    """
+    # Получаем строку, на которую кликнули
+    row = self.table_widget.rowAt(position.y())
+    col = self.table_widget.columnAt(position.x())
+
+    # Показываем меню только для первого столбца
+    if col == 0 and row >= 0:
+      # Создаем контекстное меню
+      menu = QMenu(self.table_widget)
+
+      # Добавляем действие "Сказать привет"
+      say_hello_action = menu.addAction("Сказать привет")
+      say_hello_action.triggered.connect(lambda: self.say_hello(row))
+
+      # Показываем меню
+      menu.exec(self.table_widget.viewport().mapToGlobal(position))
+
+  def say_hello(self, row):
+    """
+    Выводит сообщение с приветствием для выбранной строки.
+    """
+    name = self.table_widget.item(row, 0).text()
+    QMessageBox.information(self, "Привет", f"Привет, {name}!")
 
   #* Добавление данных в базу данных
   @asyncSlot()
