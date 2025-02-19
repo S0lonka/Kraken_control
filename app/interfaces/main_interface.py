@@ -443,7 +443,7 @@ class MainWindow(QMainWindow):
 
 
 
-  #! Информация
+  #! Сборка
   @asyncSlot()
   async def show_info(self):
     """
@@ -457,11 +457,7 @@ class MainWindow(QMainWindow):
     self.info_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     info_text = f"""
-    Вывод1 - [Переменная1]
-    Вывод2 - [Переменная2]
-    Вывод3 - [Переменная3]
-    Вывод4 - [Переменная4]
-    Вывод5 - [Переменная5]
+    Здесь будет сборка exe(Скоро)
     """
 
     logging.debug("Установка текста для метки информации")
