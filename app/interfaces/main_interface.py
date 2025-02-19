@@ -583,6 +583,22 @@ class MainWindow(QMainWindow):
       # Создаем контекстное меню
       menu = QMenu(self.table_widget)
 
+      # Задаем стили для меню
+      menu.setStyleSheet("""
+        QMenu {
+          background-color: #333333;  /* Цвет фона меню */
+          color: white;              /* Цвет текста */
+          border: 1px solid #555555; /* Рамка меню */
+        }
+        QMenu::item {
+          padding: 5px 20px;         /* Отступы внутри элементов */
+        }
+        QMenu::item:selected {
+          background-color: #555555; /* Цвет фона при наведении */
+          color: #ffffff;            /* Цвет текста при наведении */
+        }
+      """)
+
       #* НАШИ ДЕЙСТВИЯ
       # Добавляем действие "Сказать привет"
       say_hello_action = menu.addAction("Сказать привет")
