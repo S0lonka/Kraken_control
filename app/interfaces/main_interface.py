@@ -588,7 +588,27 @@ class MainWindow(QMainWindow):
 
   # Удаление пользователя из выбранной строки
   def delete_user(self, row):
-    None
+    row_number = row + 1
+    try:
+      if row_number < 1:
+        QMessageBox.warning(self, "Ошибка", "Номер строки должен быть больше 0")
+        return
+
+      # Получаем список ID из базы данных
+      self.cursor.execute("SELECT id FROM connection_table")
+      ids = [row[0] for row in self.cursor.fetchall()]
+
+      # Проверяем, что номер строки корректен
+      if 1 <= row_number <= len(ids):
+        # Удаляем строку из базы данных
+        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
+        self.db_connection.commit()
+        self.update_table()  # Обновляем таблицу
+        self.delete_input.clear()  # Очищаем поле ввода
+      else:
+        QMessageBox.warning(self, "Ошибка", "Номер строки вне диапазона")
+    except ValueError:
+      QMessageBox.warning(self, "Ошибка", "Ошибка: введите корректный номер строки")
 
 
 
