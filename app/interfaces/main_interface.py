@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
                              QTableWidgetItem, QLineEdit, QMessageBox, QMenu)
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QPixmap
 from qasync import asyncSlot
 # import discordrp
 import logging
@@ -351,24 +351,14 @@ class MainWindow(QMainWindow):
 
 
 
-
-
   #! Видео
   @asyncSlot()
   async def show_video(self):
     """
     Отображает интерфейс для видео.
     """
-    logging.info("Отображение интерфейса для видео")
     self.clear_content()
-
-    logging.debug("Создание метки для видео")
-    self.video_label = QLabel("Здесь будет видео")
-    self.video_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    logging.debug("Добавление метки в макет")
-    self.content_layout.addWidget(self.video_label)
-
+    
 
   #! Key Logger
   @asyncSlot()
@@ -551,9 +541,6 @@ class MainWindow(QMainWindow):
       # Добавляем действие "Удалить"
       delete_user_action = menu.addAction("Удалить пользователя")
       delete_user_action.triggered.connect(lambda: self.delete_user(row))
-
-
-
 
       # Показываем меню
       menu.exec(self.table_widget.viewport().mapToGlobal(position))
