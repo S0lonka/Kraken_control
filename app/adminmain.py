@@ -6,24 +6,8 @@ from qasync import QEventLoop
 
 # Импорты моих модулей
 from interfaces.license_interface import LicenseAgreementDialog
-from interfaces.start_interface import StartWindow
 from interfaces.main_interface import MainWindow
 
-
-def main():
-  app = QApplication(sys.argv)
-  loop = QEventLoop(app)
-  asyncio.set_event_loop(loop)
-
-  if LicenseAgreementDialog().exec() == QDialog.DialogCode.Accepted:
-    start_window = StartWindow()
-    start_window.show()
-
-    with loop:
-      loop.run_forever()
-  else:
-    print("by")
-    sys.exit()  # Завершаем программу, если лицензия не принята
 
 def mainwindow():
   app = QApplication(sys.argv)
@@ -40,8 +24,4 @@ def mainwindow():
     sys.exit()  # Завершаем программу, если лицензия не принята
 
 if __name__ == "__main__":
-  a = input("Введите main или просто нажмите enter\n")
-  if a == "main":
-    mainwindow()
-  else:
-    main()
+  mainwindow()

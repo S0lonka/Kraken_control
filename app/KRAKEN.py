@@ -6,7 +6,7 @@ from qasync import QEventLoop
 
 # Импорты моих модулей
 from interfaces.license_interface import LicenseAgreementDialog
-from interfaces.start_interface import StartWindow
+from interfaces.main_interface import MainWindow
 
 
 def main():
@@ -15,8 +15,8 @@ def main():
   asyncio.set_event_loop(loop)
 
   if LicenseAgreementDialog().exec() == QDialog.DialogCode.Accepted:
-    start_window = StartWindow()
-    start_window.show()
+    main_window = MainWindow()
+    main_window.show()
 
     with loop:
       loop.run_forever()
