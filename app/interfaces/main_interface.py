@@ -210,6 +210,7 @@ class MainWindow(QMainWindow):
     logging.info("Предупреждение отображено в терминале")
 
   # Функция подключения к client
+  @asyncSlot()
   async def handle_client(self, reader, writer):
     logging.debug("сопряжение с клиентом прошло успешно")
     self.reader = reader
@@ -232,10 +233,10 @@ class MainWindow(QMainWindow):
       self.terminal_output.append(f"если ты это видишь, видимо ты где-то облажался, rest and peace")
       self.terminal_output.insertHtml(f"<font color='red'>{e}</font><br>")
     finally:
-        # Закрытие соединения
-        logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
-        writer.close()
-        await writer.wait_closed()
+      # Закрытие соединения
+      logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
+      writer.close()
+      await writer.wait_closed()
 
 
   #! Обработка команд
@@ -561,19 +562,35 @@ class MainWindow(QMainWindow):
       # Создаем контекстное меню
       menu = QMenu(self.table_widget)
 
+      #* НАШИ ДЕЙСТВИЯ
       # Добавляем действие "Сказать привет"
       say_hello_action = menu.addAction("Сказать привет")
       say_hello_action.triggered.connect(lambda: self.say_hello(row))
 
+      # Добавляем действие "Удалить"
+      delete_user_action = menu.addAction("Удалить пользователя")
+      delete_user_action.triggered.connect(lambda: self.delete_user(row))
+
+
+
+
       # Показываем меню
       menu.exec(self.table_widget.viewport().mapToGlobal(position))
 
+  # ФУНКЦИИ КОНТЕКСТНОГО МЕНЮ
+  # ТЕСТ: Сказать привет
   def say_hello(self, row):
     """
     Выводит сообщение с приветствием для выбранной строки.
     """
     name = self.table_widget.item(row, 0).text()
     QMessageBox.information(self, "Привет", f"Привет, {name}!")
+
+  # Удаление пользователя из выбранной строки
+  def delete_user(self, row):
+    None
+
+
 
   #* Добавление данных в базу данных
   @asyncSlot()
@@ -619,13 +636,13 @@ class MainWindow(QMainWindow):
     # Получаем номер строки из поля ввода
     row_number_text = self.delete_input.text().strip()
     if not row_number_text:
-      print("Введите номер строки")
+      QMessageBox.warning(self, "Ошибка", "Введите номер строки")
       return
 
     try:
       row_number = int(row_number_text)  # Преобразуем в число
       if row_number < 1:
-        print("Номер строки должен быть больше 0")
+        QMessageBox.warning(self, "Ошибка", "Номер строки должен быть больше 0")
         return
 
       # Получаем список ID из базы данных
@@ -640,9 +657,9 @@ class MainWindow(QMainWindow):
         await self.update_table()  # Обновляем таблицу
         self.delete_input.clear()  # Очищаем поле ввода
       else:
-        print("Номер строки вне диапазона")
+        QMessageBox.warning(self, "Ошибка", "Номер строки вне диапазона")
     except ValueError:
-      print("Ошибка: введите корректный номер строки")
+      QMessageBox.warning(self, "Ошибка", "Ошибка: введите корректный номер строки")
 
   #* Обновление таблицы
   @asyncSlot()
@@ -672,16 +689,6 @@ class MainWindow(QMainWindow):
     self.db_connection.close()
     event.accept()
 
-  #! Очистка интерфейса
-  def clear_content(self):
-    """
-    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
-    """
-    for i in reversed(range(self.content_layout.count())):
-      self.content_layout.itemAt(i).widget().setParent(None)
-
-    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
-    self.keylogger_active = False
 
 
   def validate_ip(self, ip):
@@ -744,3 +751,14 @@ class MainWindow(QMainWindow):
         color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
     """)
+
+  #! Очистка интерфейса
+  def clear_content(self):
+    """
+    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
+    """
+    for i in reversed(range(self.content_layout.count())):
+      self.content_layout.itemAt(i).widget().setParent(None)
+
+    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
+    self.keylogger_active = False
