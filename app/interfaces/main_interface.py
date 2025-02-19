@@ -482,7 +482,7 @@ class MainWindow(QMainWindow):
     """)
     self.db_connection.commit()
 
-  #* Отображение
+# Отображение БД
   @asyncSlot()
   async def show_database(self):
     """
@@ -513,24 +513,6 @@ class MainWindow(QMainWindow):
     self.input_layout.addWidget(self.port_input)
     self.input_layout.addWidget(self.add_button)
 
-    # Создаем контейнер для удаления строк
-    self.delete_container = QWidget()
-    self.delete_layout = QHBoxLayout(self.delete_container)
-
-    # Создаем поле ввода для номера строки
-    self.delete_input = QLineEdit()
-    self.delete_input.setPlaceholderText("Номер строки")
-    self.delete_input.setFixedWidth(100)  # Ограничиваем ширину поля ввода
-
-    # Создаем кнопку "Удалить"
-    self.delete_button = QPushButton("Удалить")
-    self.delete_button.clicked.connect(self.delete_from_database)
-
-    # Добавляем поле ввода и кнопку в layout
-    self.delete_layout.addWidget(self.delete_input)
-    self.delete_layout.addWidget(self.delete_button)
-    self.delete_layout.addStretch()  # Добавляем растяжку, чтобы кнопка была слева
-
     # Создаем прокручиваемую область и таблицу
     self.scroll_area = QScrollArea()
     self.scroll_area.setWidgetResizable(True)
@@ -540,9 +522,8 @@ class MainWindow(QMainWindow):
     self.table_widget.customContextMenuRequested.connect(self.show_context_menu)  # Подключаем обработчик
     self.scroll_area.setWidget(self.table_widget)
 
-    # Добавляем контейнеры с полями ввода и таблицу в layout
+    # Добавляем контейнер с полями ввода и таблицу в layout
     self.content_layout.addWidget(self.input_container)
-    self.content_layout.addWidget(self.delete_container)
     self.content_layout.addWidget(self.scroll_area)
 
     # Обновляем таблицу данными из базы данных
@@ -586,7 +567,7 @@ class MainWindow(QMainWindow):
     name = self.table_widget.item(row, 0).text()
     QMessageBox.information(self, "Привет", f"Привет, {name}!")
 
-  # Удаление пользователя из выбранной строки
+  # Удаление пользователя из БД
   def delete_user(self, row):
     row_number = row + 1
     try:
@@ -646,40 +627,6 @@ class MainWindow(QMainWindow):
 
     # Обновляем таблицу
     await self.update_table()
-
-  #* Удаление строки из базы данных
-  @asyncSlot()
-  async def delete_from_database(self):
-    """
-    Удаляет строку из базы данных по указанному номеру.
-    """
-    # Получаем номер строки из поля ввода
-    row_number_text = self.delete_input.text().strip()
-    if not row_number_text:
-      QMessageBox.warning(self, "Ошибка", "Введите номер строки")
-      return
-
-    try:
-      row_number = int(row_number_text)  # Преобразуем в число
-      if row_number < 1:
-        QMessageBox.warning(self, "Ошибка", "Номер строки должен быть больше 0")
-        return
-
-      # Получаем список ID из базы данных
-      self.cursor.execute("SELECT id FROM connection_table")
-      ids = [row[0] for row in self.cursor.fetchall()]
-
-      # Проверяем, что номер строки корректен
-      if 1 <= row_number <= len(ids):
-        # Удаляем строку из базы данных
-        self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
-        self.db_connection.commit()
-        await self.update_table()  # Обновляем таблицу
-        self.delete_input.clear()  # Очищаем поле ввода
-      else:
-        QMessageBox.warning(self, "Ошибка", "Номер строки вне диапазона")
-    except ValueError:
-      QMessageBox.warning(self, "Ошибка", "Ошибка: введите корректный номер строки")
 
   #* Обновление таблицы
   @asyncSlot()

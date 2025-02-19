@@ -33,4 +33,5 @@ def log_clear():
 if __name__ == "__main__":
   # Очищаем логгер
   log_clear()
+  # Запускаем основной скрипт
   main()
