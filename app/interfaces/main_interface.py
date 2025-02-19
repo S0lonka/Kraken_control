@@ -585,7 +585,6 @@ class MainWindow(QMainWindow):
         self.cursor.execute("DELETE FROM connection_table WHERE id = ?", (ids[row_number - 1],))
         self.db_connection.commit()
         self.update_table()  # Обновляем таблицу
-        self.delete_input.clear()  # Очищаем поле ввода
       else:
         QMessageBox.warning(self, "Ошибка", "Номер строки вне диапазона")
     except ValueError:
