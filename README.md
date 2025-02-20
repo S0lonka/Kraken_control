@@ -1,4 +1,4 @@
-![](resources/img/imgReadme/kraken_background.jpg)
+![](resources/img/kraken_background.jpg)
 
 # Start Guide 
 1. Запускаем файл build.py (Для сборки нужного файла)
@@ -9,7 +9,7 @@
 ---
 
 ## Main terminal
-![Терминал](resources/img/imgReadme/terminal.png)
+![Терминал](resources/img/terminal.png)
 
 **Команды:**
 - <u>/help</u> - Список команд

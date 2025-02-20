@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("KRAKEN - System control")
 
     # Иконка приложения
-    self.icon_path = resource_path("img/kraken.jpg")
+    self.icon_path = resource_path("resources/img/kraken.jpg")
     self.setWindowIcon(QIcon(self.icon_path))
 
     # x, y, width, height
