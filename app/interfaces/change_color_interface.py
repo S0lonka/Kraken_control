@@ -188,6 +188,7 @@ class ColorChangerApp(QWidget):
     # Сохраняем изменения в файл style_variables.py
     self.save_editable_colors_to_file()
 
+
   def save_editable_colors_to_file(self):
     # Формируем содержимое для записи в файл
     file_content = f"""
@@ -198,14 +199,14 @@ editable_colors = {editable_colors}
     # Получаем путь файла
     self.style_variables_editable_path = resource_path("app/interfaces/utils/style/style_variables_editable.py")
 
-    # Путь к файлу в постоянной папке (например, рядом с исполняемым файлом)
-    self.persistent_folder = os.path.dirname(sys.executable)  # Папка с исполняемым файлом
-    self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
+    # # Путь к файлу в постоянной папке (например, рядом с исполняемым файлом)
+    # self.persistent_folder = os.path.dirname(sys.executable)  # Папка с исполняемым файлом
+    # self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
 
-    # Убеждаемся, что файл существует в постоянной папке
-    ensure_file_exists(self.style_variables_editable_path, self.destination_file)
+    # # Убеждаемся, что файл существует в постоянной папке
+    # ensure_file_exists(self.style_variables_editable_path, self.destination_file)
     # Записываем в файл
-    with open(self.destination_file, "w", encoding="utf-8") as file:
+    with open(self.style_variables_editable_path, "w", encoding="utf-8") as file:
       file.write(file_content)
     
     # Обновляем стили в родительском окне

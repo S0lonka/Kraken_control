@@ -10,7 +10,8 @@ a = Analysis(
     binaries=[],
     datas=[
         ('app\\sqlite.db', 'app'),
-        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\kraken.jpg', 'resources/img')
+        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\resources\\img\\kraken.jpg', 'resources/img'),
+        ('C:\\Users\\Solonka\\Documents\\GitHub\\Kraken_control\\app\\interfaces\\utils\\style\\style_variables_editable.py', 'app/interfaces/utils/style')
     ],
     hiddenimports=['interfaces','qasync'],
     hookspath=[],

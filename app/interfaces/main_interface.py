@@ -76,48 +76,7 @@ class MainWindow(QMainWindow):
     self.db_path = resource_path('app/sqlite.db')
 
     # Применяем стили
-    self.setStyleSheet(f"""
-      QWidget {{
-        background-color: #{editable_colors["QWidget_bc"]};  /* Темно-серый фон */
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-      }}
-      QPushButton {{
-        background-color: #{editable_colors["button_bc"]};  /* Серый фон кнопок */
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
-        padding: 5px;
-        border-radius: 3px;
-      }}
-      QPushButton:hover {{
-        background-color: #{editable_colors["border_color"]};  /* Голубой фон при наведении */
-        color: #{editable_colors["button_color_hover"]};  /* Темный текст */
-      }}
-      QLineEdit, QTextEdit {{
-        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон полей ввода */
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
-        padding: 5px;
-        border-radius: 3px;
-      }}
-      QTableWidget {{
-        background-color: #{editable_colors["input_area"]};  /* Темно-серый фон таблицы */
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-        gridline-color: #{editable_colors["border_color"]};  /* Голубые линии сетки */
-      }}
-      QHeaderView::section {{
-        background-color: #{editable_colors["button_bc"]};  /* Серый фон заголовков таблицы */
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-        padding: 5px;
-        border: 1px solid #{editable_colors["border_color"]};  /* Голубая рамка */
-      }}
-      QScrollArea {{
-        background-color: #{editable_colors["button_color_hover"]};  /* Темно-серый фон */
-        border: none;
-      }}
-      QLabel {{
-        color: #{editable_colors["text_color"]};  /* Белый текст */
-      }}
-    """)
+    self.update_styles()
 
     # Создаем контейнер для кнопок и основного окна
     self.main_widget = QWidget()
