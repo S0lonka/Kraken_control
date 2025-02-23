@@ -57,6 +57,21 @@ def resource_path(relative_path):
   return os.path.join(base_path, relative_path)
 
 
+# Функция для получения пути к файлу style_variables_editable.py
+def get_style_variables_path():
+  """
+  Возвращает путь к файлу style_variables_editable.py в зависимости от того,
+  запущено ли приложение как exe или из исходного кода.
+  """
+  if hasattr(sys, '_MEIPASS'):
+    # Если приложение запущено как exe, файл должен быть рядом с exe
+    return os.path.join(os.path.dirname(sys.executable), "exe_resources/style_variables_editable.py")
+  else:
+    # Если приложение запущено из исходного кода, используем стандартный путь
+    return resource_path("app/interfaces/utils/style/style_variables_editable.py")
+
+
+
 #! Класс Основного окна
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -75,6 +90,9 @@ class MainWindow(QMainWindow):
     # Получаем путь к БД
     self.db_path = resource_path('app/sqlite.db')
 
+
+    # Загружаем стили из файла при инициализации
+    self.load_editable_colors_from_file()
     # Применяем стили
     self.update_styles()
 
@@ -745,7 +763,26 @@ class MainWindow(QMainWindow):
       }}
     """)
 
+  # Загрузка стилей из файла
+  def load_editable_colors_from_file(self):
+    """
+    Загружает стили из файла style_variables_editable.py.
+    """
+    style_variables_path = get_style_variables_path()
+    if os.path.exists(style_variables_path):
+      with open(style_variables_path, "r", encoding="utf-8") as file:
+        exec(file.read(), globals())
+      logging.info("Стили загружены из файла")
 
+  # Сохранение стилей в файл
+  def save_editable_colors_to_file(self):
+    """
+    Сохраняет стили в файл style_variables_editable.py.
+    """
+    style_variables_path = get_style_variables_path()
+    with open(style_variables_path, "w", encoding="utf-8") as file:
+      file.write(f"editable_colors = {editable_colors}")
+    logging.info("Стили сохранены в файл")
 
   #! Очистка интерфейса
   def clear_content(self):

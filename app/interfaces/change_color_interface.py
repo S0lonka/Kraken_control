@@ -131,6 +131,9 @@ class ColorChangerApp(QWidget):
 
     self.setLayout(layout)
 
+    # Загружаем сохраненные стили при запуске
+    self.load_editable_colors_from_file()
+
   def get_readable_name(self, color_name):
     # Преобразуем имена переменных в читаемые названия
     name_map = {
@@ -185,9 +188,8 @@ class ColorChangerApp(QWidget):
       if len(hex_color) == 6 and all(c in "0123456789ABCDEFabcdef" for c in hex_color):
         editable_colors[color_name] = hex_color
 
-    # Сохраняем изменения в файл style_variables.py
+    # Сохраняем изменения в файл
     self.save_editable_colors_to_file()
-
 
   def save_editable_colors_to_file(self):
     # Формируем содержимое для записи в файл
@@ -196,22 +198,37 @@ class ColorChangerApp(QWidget):
 editable_colors = {editable_colors}
 """
 
-    # Получаем путь файла
-    self.style_variables_editable_path = resource_path("app/interfaces/utils/style/style_variables_editable.py")
+    # Путь к папке exe_resources
+    self.persistent_folder = os.path.join(os.path.dirname(sys.executable), "exe_resources")
+    os.makedirs(self.persistent_folder, exist_ok=True)  # Создаем папку, если она не существует
 
-    # # Путь к файлу в постоянной папке (например, рядом с исполняемым файлом)
-    # self.persistent_folder = os.path.dirname(sys.executable)  # Папка с исполняемым файлом
-    # self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
+    # Путь к файлу в папке exe_resources
+    self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
 
-    # # Убеждаемся, что файл существует в постоянной папке
-    # ensure_file_exists(self.style_variables_editable_path, self.destination_file)
     # Записываем в файл
-    with open(self.style_variables_editable_path, "w", encoding="utf-8") as file:
+    with open(self.destination_file, "w", encoding="utf-8") as file:
       file.write(file_content)
     
     # Обновляем стили в родительском окне
     if self.parent:  # Проверяем, есть ли родительское окно
       self.parent.update_styles()  # Вызываем метод обновления стилей
+
+  def load_editable_colors_from_file(self):
+    # Путь к папке exe_resources
+    self.persistent_folder = os.path.join(os.path.dirname(sys.executable), "exe_resources")
+    self.destination_file = os.path.join(self.persistent_folder, "style_variables_editable.py")
+
+    # Если файл существует, загружаем его
+    if os.path.exists(self.destination_file):
+      with open(self.destination_file, "r", encoding="utf-8") as file:
+        exec(file.read(), globals())
+
+      # Обновляем интерфейс в соответствии с загруженными стилями
+      for color_name, color_value in editable_colors.items():
+        getattr(self, f"{color_name}_slider").setValue(int(color_value, 16))
+        getattr(self, f"{color_name}_input").setText(color_value)
+        self.update_color_box(color_name, color_value)
+        self.update_slider_style(color_name)
 
   def reset_colors(self):
     # Сбрасываем цвета на базовые значения
@@ -225,5 +242,5 @@ editable_colors = {editable_colors}
       # Восстанавливаем базовые значения в editable_colors
       editable_colors[color_name] = default_color
 
-    # Сохраняем изменения в файл style_variables.py
+    # Сохраняем изменения в файл
     self.save_editable_colors_to_file()
